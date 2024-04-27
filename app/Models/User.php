@@ -60,5 +60,10 @@ class User extends Authenticatable
             get: fn(?string $value) => ucfirst(str($this->name)->explode(' ')->first())
         );
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }
     

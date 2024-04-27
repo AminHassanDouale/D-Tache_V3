@@ -77,7 +77,8 @@
             <x-menu-separator />
 
             <x-menu-item title="Home" icon="o-chart-pie" link="/home" />
-            <x-menu-item title="Projects" icon="o-gift" link="/projects" />
+            <x-menu-item title="Projects" icon="o-squares-plus" link="/projects" />
+            <x-menu-item title="Tasks" icon="o-document-check" link="/tasks" />
             <x-menu-item title="Customers" icon="o-user" link="/users" />
 
             <x-menu-sub title="Warehouse" icon="o-wrench-screwdriver">

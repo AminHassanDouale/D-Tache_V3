@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->string('assigned_id');
-            $table->string('tags');
+            $table->integer('assigned_id');
+            $table->string('tags')->nullable();
             $table->date('start_date');
             $table->date('due_date');
             $table->foreignId('category_id')->constrained('categories');

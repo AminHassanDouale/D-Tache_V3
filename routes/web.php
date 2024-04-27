@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\changePasswordController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
@@ -80,6 +81,13 @@ Volt::route('/projects/{project}/edit', 'projects.edit');
 
 //tasks
 Volt::route('/tasks', 'tasks.index');
+Volt::route('/tasks/{task}/edit', 'tasks.edit')->name('tasks.edit');
+
+
+//files
+
+Route::post('/upload-files/{task}', [FileController::class, 'store'])->name('file.store');
+
 
 
 
