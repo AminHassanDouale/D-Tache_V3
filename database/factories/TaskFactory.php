@@ -17,7 +17,19 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->sentence,
+            'description' => $this->faker->paragraph,
+            'assigned_id' => $this->faker->numberBetween(1, 2), // Adjust as needed
+            'tags' => $this->faker->words(3, true),
+            'start_date' => $this->faker->date(),
+            'due_date' => $this->faker->date(),
+            'category_id' => $this->faker->numberBetween(2, 4), // Adjust as needed
+            'status_id' => $this->faker->numberBetween(1, 5), // Adjust as needed
+            'project_id' => $this->faker->numberBetween(1, 5), // Adjust as needed
+            'department_id' => $this->faker->numberBetween(1, 6), // Adjust as needed
+            'user_id' => $this->faker->numberBetween(1, 2), // Adjust as needed
+            'priority_id' => $this->faker->numberBetween(9, 12), // Adjust as needed
+
         ];
     }
 }

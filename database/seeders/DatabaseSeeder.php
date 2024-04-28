@@ -21,6 +21,6 @@ class DatabaseSeeder extends Seeder
        // $this->call(OrderSeeder::class);
        // $this->call(DepartmentSeeder::class);
        // $this->call(StatusSeeder::class);
-        $this->call(PrioritySeeder::class);
+       // $this->call(PrioritySeeder::class);
     }
 }

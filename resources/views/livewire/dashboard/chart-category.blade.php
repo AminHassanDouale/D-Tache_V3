@@ -1,14 +1,14 @@
 <?php
 
-use App\Models\Product;
-use Illuminate\Support\Carbon;
+use App\Models\Task; 
+use Illuminate\Support\Facades\DB; 
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Volt\Component;
 
 new class extends Component {
     #[Reactive]
-    public string $period = '-30 days';
+    public string $period = '-100 days';
 
     public array $chartCategory = [
         'type' => 'doughnut',
@@ -38,15 +38,14 @@ new class extends Component {
     #[Computed]
     public function refreshChartCategory(): void
     {
-        $sales = Product::query()
-            ->with('category')
+        $tasks = Task::query()
             ->selectRaw("count(category_id) as total, category_id")
-            ->whereRelation('sales.order', 'created_at', '>=', Carbon::parse($this->period)->startOfDay())
+            ->where('created_at', '>=', now()->subDays(30)->startOfDay())
             ->groupBy('category_id')
             ->get();
 
-        Arr::set($this->chartCategory, 'data.labels', $sales->pluck('category.name'));
-        Arr::set($this->chartCategory, 'data.datasets.0.data', $sales->pluck('total'));
+        Arr::set($this->chartCategory, 'data.labels', $tasks->pluck('category.name'));
+        Arr::set($this->chartCategory, 'data.datasets.0.data', $tasks->pluck('total'));
     }
 
     public function with(): array
@@ -58,7 +57,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <x-card title="Category" separator shadow>
+    <x-card title="Categorie" separator shadow>
         <x-chart wire:model="chartCategory" class="h-44" />
     </x-card>
 </div>

@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Order;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Reactive;
@@ -8,44 +8,32 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     #[Reactive]
-    public string $period = '-30 days';
+    public string $period = '-100 days';
 
     public function topCustomers(): Collection
     {
-        return Order::query()
-            ->with('user.country')
-            ->selectRaw("sum(total) as amount, user_id")
-            ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
-            ->groupBy('user_id')
-            ->orderByDesc('amount')
-            ->take(3)
-            ->get()
-            ->transform(function (Order $order) {
-                $user = $order->user;
-                $user->amount = Number::currency($order->amount);
-
-                return $user;
-            });
+        return User::with(['tasks' => function ($query) {
+            $query->where('created_at', '>=', Carbon::parse($this->period)->startOfDay());
+        }])->get();
     }
 
     public function with(): array
     {
         return [
-            'topCustomers' => $this->topCustomers(),
+            'usersWithTasks' => $this->topCustomers(),
         ];
     }
 }; ?>
-
 <div>
-    <x-card title="Top Customers" separator shadow>
+    <x-card title="Equibe" separator shadow>
         <x-slot:menu>
-            <x-button label="Customers" icon-right="o-arrow-right" link="/users" class="btn-ghost btn-sm" />
         </x-slot:menu>
 
-        @foreach($topCustomers as $customer)
-            <x-list-item :item="$customer" sub-value="country.name" link="/users/{{ $customer->id }}" no-separator>
+        @foreach($usersWithTasks as $user)
+            <x-list-item :item="$user" sub-value="country.name" link="/users/{{ $user->id }}" no-separator>
+                <h2>{{ $user->name }}</h2>
                 <x-slot:actions>
-                    <x-badge :value="$customer->amount" class="font-bold" />
+                    <x-badge :value="$user->tasks->count()" class="font-bold" />
                 </x-slot:actions>
             </x-list-item>
         @endforeach

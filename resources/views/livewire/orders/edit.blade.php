@@ -98,7 +98,7 @@ new class extends Component {
         </x-slot:actions>
     </x-header>
 
-    <div class="grid lg:grid-cols-2 gap-8">
+    <div class="grid gap-8 lg:grid-cols-2">
         {{-- CUSTOMER --}}
         <livewire:orders.customer :$order />
 
@@ -109,14 +109,14 @@ new class extends Component {
             </x-slot:menu>
 
             <div class="grid gap-2">
-                <div class="flex gap-3 justify-between items-baseline px-10">
+                <div class="flex items-baseline justify-between gap-3 px-10">
                     <div>Items</div>
-                    <div class="border-b border-b-gray-400 border-dashed flex-1"></div>
+                    <div class="flex-1 border-b border-dashed border-b-gray-400"></div>
                     <div class="font-black">({{ $order->items()->count() }})</div>
                 </div>
-                <div class="flex gap-3 justify-between items-baseline px-10">
+                <div class="flex items-baseline justify-between gap-3 px-10">
                     <div>Total</div>
-                    <div class="border-b border-b-gray-400 border-dashed flex-1"></div>
+                    <div class="flex-1 border-b border-dashed border-b-gray-400"></div>
                     <div class="font-black">{{ $order->total_human }}</div>
                 </div>
             </div>
@@ -149,11 +149,11 @@ new class extends Component {
         </x-table>
 
         @if(!$order->items->count())
-            <x-icon name="o-list-bullet" label="Nothing here." class="text-gray-400 mt-5" />
+            <x-icon name="o-list-bullet" label="Nothing here." class="mt-5 text-gray-400" />
         @endif
     </x-card>
 
-    <div class="text-gray-400 text-xs mt-5">
+    <div class="mt-5 text-xs text-gray-400">
         On this demo you are able to freely modify the order regardless its status.
         The orders goes to a random status after adding an item, just for better display on orders list.
         Of course, you should improve this business logic.

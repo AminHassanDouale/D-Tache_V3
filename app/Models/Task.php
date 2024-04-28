@@ -29,13 +29,13 @@ class Task extends Model
         'start_date' => 'date',
         'due_date' => 'date',
     ];
-    protected static function booted()
-    {
-        static::creating(function ($project) {
-            $project->user_id = Auth::user()->id;
-            $project->department_id = Auth::user()->department_id;
-        });
-    }
+   // protected static function booted()
+   // {
+   //     static::creating(function ($project) {
+   //         $project->user_id = Auth::user()->id;
+   //         $project->department_id = Auth::user()->department_id;
+   //     });
+   // }
 
     public function status(): BelongsTo
     {
@@ -68,4 +68,12 @@ class Task extends Model
    {
        return $this->morphMany(History::class, 'model');
    }
+   public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function tasks()
+    {
+        return Task::where('project_id', $this->project->id)->get();
+    }
 }

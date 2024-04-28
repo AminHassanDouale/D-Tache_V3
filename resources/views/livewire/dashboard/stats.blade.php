@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Order;
+use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
 use Livewire\Attributes\Reactive;
@@ -8,7 +8,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     #[Reactive]
-    public string $period = '-30 days';
+    public string $period = '-100 days';
 
     // General statistics
     public function stats(): array
@@ -17,18 +17,30 @@ new class extends Component {
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
             ->count();
 
-        $orders = Order::query()
+        $tasks = Task::query()
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
             ->count();
 
-        $gross = Order::query()
+        $taskpending= Task::query()
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
-            ->sum('total');
+            ->where('status_id', '!=', 5)
+            ->count();
+        $taskterminated= Task::query()
+            ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
+            ->where('status_id', '=', 5)
+            ->count();
+            $taskDelayed = Task::query()
+            ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
+            ->where('status_id', '!=', 5)
+            ->whereDate('due_date', '<=', Carbon::now()) 
+            ->count(); 
 
         return [
             'newCustomers' => $newCustomers,
-            'orders' => $orders,
-            'gross' => Number::currency($gross)
+            'tasks' => $tasks,
+            'taskpending' => $taskpending,
+            'taskterminated' => $taskterminated,
+            'taskDelayed' => $taskDelayed,
         ];
     }
 
@@ -41,10 +53,10 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="grid lg:grid-cols-4 gap-5 lg:gap-8">
-        <x-stat :value="$stats['gross']" title="Gross" icon="o-banknotes" class="shadow truncate text-ellipsis" />
-        <x-stat :value="$stats['orders']" title="Orders" icon="o-gift" class="shadow" />
-        <x-stat :value="$stats['newCustomers']" title="New customers" icon="o-user-plus" class="shadow" />
-        <x-stat value="maryUI" title="Built with" icon="o-heart" color="!text-pink-500" class="shadow" />
+    <div class="grid gap-5 lg:grid-cols-4 lg:gap-8">
+        <x-stat :value="$stats['tasks']" title="Tasks" icon="o-clipboard-document-list" class="shadow" />
+        <x-stat :value="$stats['taskterminated']" title="tTerminer" icon="o-document-check" class="truncate shadow text-ellipsis" />
+        <x-stat :value="$stats['taskpending']" title="En Progress" icon="o-document-duplicate" class="truncate shadow text-ellipsis" />
+        <x-stat :value="$stats['taskDelayed']" title="Retard" icon="o-minus-circle" class="truncate shadow text-ellipsis" />
     </div>
 </div>

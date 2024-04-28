@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\OrderItem;
+use App\Models\Project;
+use App\Models\Task;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Reactive;
@@ -8,46 +10,41 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     #[Reactive]
-    public string $period = '-30 days';
+    public string $period = '-100 days';
 
-    public function bestSellers(): Collection
+    public function bestProjects(): Collection
     {
-        return OrderItem::query()
-            ->with('product.category')
-            ->selectRaw("count(1) as amount, product_id")
-            ->whereRelation('order', 'created_at', '>=', Carbon::parse($this->period)->startOfDay())
-            ->groupBy('product_id')
-            ->orderByDesc('amount')
-            ->take(3)
+        return Project::withCount('tasks')
+        ->whereHas('tasks', function ($query) {
+                $query->where('created_at', '>=', now()->startOfDay()->subDays(100));
+            })
             ->get()
-            ->transform(function (OrderItem $item) {
-                $product = $item->product;
-                $product->amount = $item->amount;
-
-                return $product;
-            });
+            ->sortByDesc('tasks_count')
+            ->take(10);
     }
 
     public function with(): array
     {
         return [
-            'bestSellers' => $this->bestSellers(),
-        ];
+            'bestProjects' => $this->bestProjects(),
+
+    ];
     }
 }; ?>
 
 <div>
-    <x-card title="Best sellers" separator shadow>
+    <x-card title="Projects" separator shadow>
         <x-slot:menu>
-            <x-button label="Products" icon-right="o-arrow-right" link="/products" class="btn-ghost btn-sm" />
+            <x-button label="Projects" icon-right="o-arrow-right" link="/projects" class="btn-ghost btn-sm" />
         </x-slot:menu>
 
-        @foreach($bestSellers as $product)
-            <x-list-item :item="$product" sub-value="category.name" avatar="cover" link="/products/{{ $product->id }}/edit" no-separator>
+        @foreach($bestProjects as $project)
+            <x-list-item :item="$project" sub-value="category.name" avatar="cover"  no-separator>
                 <x-slot:actions>
-                    <x-badge :value="$product->amount" class="font-bold" />
+                    <x-badge :value="$project->tasks_count" class="font-bold" />
                 </x-slot:actions>
             </x-list-item>
         @endforeach
     </x-card>
 </div>
+

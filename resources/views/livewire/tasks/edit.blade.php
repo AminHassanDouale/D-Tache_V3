@@ -6,6 +6,7 @@ use App\Models\Note;
 use App\Models\Task;
 use App\Models\Status;
 use App\Models\User;
+use App\Models\Project;
 use App\Models\File;
 use App\Models\Category;
 use App\Models\Priority;
@@ -21,11 +22,12 @@ new class extends Component {
     public $assigned_id;
     public $description;
     public $status_id;
+    public $project_id;
     public $priority_id;
     public $category_id;
     public $start_date;
     public $due_date;
-    public $files = []; // Add files property to store uploaded files
+    public $files = []; 
     public $tags = [];
     public $comment;
     public function mount(Task $task)
@@ -39,6 +41,7 @@ new class extends Component {
         $this->priority_id = $task->priority_id;
         $this->category_id = $task->category_id;
         $this->assigned_id = $task->assigned_id;
+        $this->project_id = $task->project_id;
         $this->tags= $task->tags;
         $this->file = $task->file;
         $this->comments = $task->comments;
@@ -47,6 +50,10 @@ new class extends Component {
     public function statuses(): Collection
     {
         return Status::orderBy('name')->get();
+    }
+    public function projects(): Collection
+    {
+        return Project::orderBy('name')->get();
     }
 
     public function categories(): Collection
@@ -71,6 +78,7 @@ new class extends Component {
         'category_id' => 'required|exists:categories,id',
         'tags' => 'required',
         'priority_id' => 'required|exists:priorities,id',
+        'project_id' => 'required|exists:projects,id',
         'status_id' => 'required|exists:statuses,id',
         'assigned_id' => 'required|exists:users,id',
         'start_date' => 'required|date',
@@ -200,6 +208,7 @@ private function logHistory($action, $modelId, $modelType)
             'statuses' => $this->statuses(),
             'categories' => $this->categories(),
             'priorities' => $this->priorities(),
+            'projects' => $this->projects(),
             'users' => $this->users(),
         ];
     }
@@ -228,6 +237,7 @@ private function logHistory($action, $modelId, $modelType)
                     <x-choices-offline label="Status" wire:model="status_id" :options="$statuses" single searchable />
                     <x-choices-offline label="Assigned" wire:model="assigned_id" :options="$users" single searchable />
                     <x-choices-offline label="Categories" wire:model="category_id" :options="$categories" single searchable  />
+                    <x-choices-offline label="projects" wire:model="project_id" :options="$projects" single searchable  />
                     <!-- Assuming $task->tags returns an array of tag names -->
                     @php
     $config1 = ['altFormat' => 'd/m/Y'];

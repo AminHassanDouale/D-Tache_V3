@@ -62,7 +62,6 @@ new class extends Component {
             ['key' => 'status.name', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
             ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'],
             ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name', ],
-          //  ['key' => 'stock', 'label' => 'new', 'class' => 'hidden lg:table-cell']
         ];
     }
 
@@ -104,10 +103,11 @@ new class extends Component {
 
     {{--  TABLE --}}
     <x-card>
-        <x-table :headers="$headers" :rows="$projects" link="/projects/{project}/edit"  :sort-by="$sortBy" with-pagination>
-            {{--  @scope('cell_preview', $project)
-            <x-avatar :image="$project->cover" class="!w-10 !rounded-lg" />
-            @endscope --}}
+        <x-table :headers="$headers" :rows="$projects"  :sort-by="$sortBy" with-pagination>
+            @scope('actions', $project)
+            <x-button :link="'/projects/' . $project->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
+
+            @endscope
         </x-table>
     </x-card>
 
@@ -118,6 +118,7 @@ new class extends Component {
             <x-select label="Status" :options="$statuses" wire:model.live="status_id" icon="o-map-pin" placeholder="All" placeholder-value="0" inline />
             <x-select label="Category" :options="$categories" wire:model.live="category_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
             <x-select label="Priority" :options="$priorities" wire:model.live="priority_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
+          
         </div>
 
         {{-- ACTIONS --}}
