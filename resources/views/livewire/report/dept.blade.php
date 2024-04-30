@@ -5,6 +5,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Project;
 use App\Models\Priority;
+use App\Models\Task;
 use App\Models\Status;
 use App\Traits\ClearsProperties;
 use App\Traits\ResetsPaginationWhenPropsChanges;
@@ -28,6 +29,11 @@ new class extends Component {
     public ?int $category_id = 0;
      #[Url]
      public ?int $priority_id = 0;
+       #[Url]
+    public string $startDate = '';
+
+#[Url]
+public string $endDate = '';
 
     #[Url]
     public array $sortBy = ['column' => 'name', 'direction' => 'asc'];
@@ -41,7 +47,7 @@ new class extends Component {
 
     public function projects(): LengthAwarePaginator
     {
-        return Project::query()
+        return Task::query()
             ->with(['status', 'category', 'priority'])
             ->withAggregate('status', 'name')
             ->withAggregate('category', 'name')
@@ -123,9 +129,17 @@ new class extends Component {
     </x-card>
 
     {{-- FILTERS --}}
+    @php
+    $config1 = ['altFormat' => 'd/m/Y'];
+@endphp
+ 
+
     <x-drawer wire:model="showFilters" title="Filters" class="lg:w-1/3" right separator with-close-button>
         <div class="grid gap-5" @keydown.enter="$wire.showFilters = false">
             <x-input label="Name ..." wire:model.live.debounce="name" icon="o-user" inline />
+            <x-datepicker label="Start Date" wire:model="startDate" icon-right="o-calendar" :config="$config1" />
+<x-datepicker label="End Date" wire:model="endDate" icon-right="o-calendar" :config="$config1" />
+
             <x-select label="Status" :options="$statuses" wire:model.live="status_id" icon="o-map-pin" placeholder="All" placeholder-value="0" inline />
             <x-select label="Category" :options="$categories" wire:model.live="category_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
             <x-select label="Priority" :options="$priorities" wire:model.live="priority_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />

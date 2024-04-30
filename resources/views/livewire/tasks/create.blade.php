@@ -2,6 +2,7 @@
 
 use App\Models\Brand;
 use App\Models\Task;
+use App\Models\User;
 use App\Models\Priority;
 use App\Traits\HasCssClassAttribute;
 use Livewire\Attributes\Modelable;
@@ -9,6 +10,9 @@ use Livewire\Attributes\Reactive;
 use Livewire\Attributes\Rule;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TaskCreatedMail;
+
 
 new class extends Component {
     use Toast, HasCssClassAttribute;
@@ -22,6 +26,7 @@ new class extends Component {
     #[Rule('required')]
     public string $due_date = '';
     public int $assigned_id = 0; // Set a default value
+    public int $project_id = 0; // Set a default value
     public int $priority_id = 0; // Set a default value
 
    
@@ -56,6 +61,15 @@ new class extends Component {
         'assigned_id' => $this->assigned_id, // Assign assigned_id
         'priority_id' => $this->priority_id, // Assign priority_id
     ]);
+    $assigned = User::findOrFail($this->assigned_id);
+    $creator = auth()->user();
+
+    Mail::to($assigned->email)->send(new TaskCreatedMail([
+        'task' => $task,
+        'assigned' => $assigned,
+        'creator' => $creator,
+        'project' => $task->project, 
+    ]));
 
     $this->show = false;
     $this->resetExcept('label', 'class');
@@ -92,8 +106,11 @@ new class extends Component {
                     <x-choices-offline label="Priority" wire:model="priority_id" :options="$priorities" single searchable></x-choices-offline>
                     @php
                    $users = App\Models\User::take(100)->get();
+                   $projects = App\Models\Project::take(100)->get();
+
                    @endphp
                     <x-select label="Assignee" icon="o-user" :options="$users" wire:model="assigned_id" />
+                    <x-select label="Project" icon="o-user" :options="$projects" wire:model="project_id" />
 
 
                 <x-slot:actions>

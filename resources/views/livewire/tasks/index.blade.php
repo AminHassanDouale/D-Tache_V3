@@ -39,7 +39,10 @@ new class extends Component {
     {
         return ($this->category_id ? 1 : 0) + ($this->status_id ? 1 : 0) + ($this->priority_id ? 1 : 0) + (strlen($this->name) ? 1 : 0);
     }
-
+    public function statuses(): Collection
+    {
+        return Status::orderBy('name')->get();
+    }
     public function tasks(): LengthAwarePaginator
     {
         return Task::query()
@@ -63,7 +66,7 @@ new class extends Component {
             ['key' => 'status.name', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
             ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'],
             ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name', ],
-            ['key' => 'user.name', 'label' => 'assignee_id', 'sortBy' => 'user_name', ],
+            ['key' => 'user.name', 'label' => 'Assignee', 'sortBy' => 'user_name', ],
           //  ['key' => 'stock', 'label' => 'new', 'class' => 'hidden lg:table-cell']
         ];
     }
@@ -115,8 +118,8 @@ new class extends Component {
             @endscope --}}
             @scope('actions', $task)
             <x-button :link="'/tasks/' . $task->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
-
             @endscope
+
         </x-table>
         @else
         <div class="flex items-center justify-center gap-10 mx-auto">

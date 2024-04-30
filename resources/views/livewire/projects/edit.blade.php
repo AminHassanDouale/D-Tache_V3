@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\Member;
 use App\Models\Priority;
+use App\Mail\Project\MemberAddedToProjectMail;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Task; 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -17,6 +19,8 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Component;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\WithPagination;
+use Illuminate\Validation\Rule;
+
 
 
 use Mary\Traits\Toast;
@@ -26,6 +30,8 @@ new class extends Component {
 
     public Project $project;
     public $name;
+    public $users = []; // Initialize $users as an empty array
+
     public $selectedUser = [];
     public $assigned_id;
     public $description;
@@ -52,6 +58,10 @@ new class extends Component {
         $this->category_id = $project->category_id;
         $this->assigned_id = $project->assigned_id;
         $this->tags = $project->tags;
+
+        $this->project = $project->load('members.user');
+
+        $this->loadNonMemberUsers();
       
     }
    
@@ -114,9 +124,10 @@ new class extends Component {
     {
         return Priority::orderBy('name')->get();
     }
-    public function users(): Collection
+    public function users()
     {
-        return User::orderBy('name')->get();
+        $this->loadNonMemberUsers();
+
     }   
     
     public function saveProject()
@@ -150,54 +161,63 @@ new class extends Component {
         );
 
 }
-public function searchMulti($search)
+public function deleteMember($memberId)
 {
-    // Update the search property
-    $this->search = $search;
+    $member = Member::findOrFail($memberId);
+    $member->delete();
 
-    // Return the filtered users based on the search query
-    return User::where('name', 'like', "%{$search}%")
-        ->take(10)
-        ->get();
+    $this->project->load('members.user');
+    $this->toast('success', 'Member deleted successfully.');
+
+}
+
+private function loadNonMemberUsers() {
+    $existingMemberIds = $this->project->members->pluck('user_id')->toArray();
+    $this->users = User::whereNotIn('id', $existingMemberIds)
+                   ->where('id', '!=', Auth::id()) // Exclude current user
+                   ->orderBy('name', 'ASC')
+                   ->get();
+
 }
 
 public function addedMember()
 {
-    // Validate if any user is selected
-    $this->validate([
-        'selectedUser' => 'required|exists:users,id' // Make sure a user is selected and exists
+
+$this->validate([
+    'selectedUser' => [
+        'required',
+        Rule::exists('users', 'id'),
+        Rule::unique('members', 'user_id')->where(function ($query) {
+            return $query->where('model_id', $this->project->id)
+                         ->where('model_type', Project::class);
+        }),
+    ],
+]);
+
+
+    Member::create([
+        'model_id' => $this->project->id,
+        'model_type' => Project::class,
+        'user_id' => $this->selectedUser,
+        'department_id' => Auth::user()->department_id,
+        'date' => Carbon::now(),
     ]);
 
-    // Check if the user is already a member
-    if (!$this->project->members()->where('user_id', $this->selectedUser)->exists()) {
-        // Create a new Member record for the selected user
-        Member::create([
-            'model_id' => $this->project->id,
-            'model_type' => Project::class,
-            'user_id' => $this->selectedUser,
-            'department_id' => Auth::user()->department_id,
-            'date' => Carbon::now(),
-        ]);
+    // Load the updated project members
+    $this->project->load('members.user');
 
-        // Load the updated project members
-        $this->project->load('members.user');
-        // Reset the list of non-member users
-       // $this->loadNonMemberUsers();
+    // Reset the list of non-member users
+    $this->loadNonMemberUsers();
+    $user = User::findOrFail($this->selectedUser);
+            Mail::to($user->email)->send(new MemberAddedToProjectMail($this->project, $user));
 
-        // Show success message
-        $this->toast('success', 'Member added successfully.');
+    // Show success message
+    $this->toast('success', 'Member added successfully.');
 
-        // Send email notification to the added user
-      //  $user = User::findOrFail($this->selectedUser);
-      //  Mail::to($user->email)->send(new MemberAddedToProjectMail($this->project, $user));
-
-        // Clear the selected user after adding
-        $this->selectedUser = null;
-    } else {
-        // Show error message if the user is already a member
-        $this->toast('error', 'This user is already a member of the project.');
-    }
+    // Clear the selected user after adding
+    $this->selectedUser = null;
 }
+
 
 
 
@@ -211,6 +231,7 @@ public function addedMember()
             'users' => $this->users(),
             'headers' => $this->headers(), 
             'tasks' => $this->tasks(), // Add this line
+
 
 
         ];
@@ -239,6 +260,7 @@ public function addedMember()
         <x-slot:actions>
         </x-slot:actions>
     </x-header>
+    <x-errors title="Oops!" description="Please, fix the errors below." />
 
     <div class="grid gap-8 lg:grid-cols-2">
         {{-- CUSTOMER --}}
@@ -273,17 +295,47 @@ public function addedMember()
                         </x-slot:actions>
                     </x-card>
                 </x-form>
-        {{-- SUMMARY --}}
-        {{-- SUMMARY --}}
-         <x-form wire:submit.prevent="addedMember">
-            <x-choices-offline
-    label="Member"
-    wire:model="user_id"
-    :options="$users"
-    searchable />
-            <x-button wire:click.prevent="addedMember" spinner="addedMember" class="mt-2" icon="o-user-plus"  />
+                <x-form wire:submit.prevent="addedMember">
+                    <select id="memberSelect" wire:model="selectedUser" class="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="">Sélectionnez membre</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                    
+                    <x-button wire:click.prevent="addedMember" spinner="addedMember" class="mt-2" icon="o-user-plus" />
+                    <hr>
+                    @if($project->members->count() > 0)
 
-        </x-form>
+                    <div>
+                        <h2>Project Members</h2>
+                        <ul>
+                            @foreach($project->members as $member)
+                                <li>{{ $member->user->name }} - <x-button wire:click="deleteMember({{ $member->id }})" class="w-5 h-5 ml-auto text-gray-500 cursor-pointer hover:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" icon="o-trash">
+                                  
+
+                                </x-button></li> 
+                                
+                            @endforeach
+                        </ul>
+                    </div>
+                    @else
+                    <x-card> 
+                    <div class="flex items-center justify-center gap-10 mx-auto">
+                        <div>
+                            <img src="/images/empty-member.png" width="300" />
+                        </div>
+                        <div class="text-lg font-medium">
+                            oops, aucun membre dans ce projet pour l instant.
+                        </div>
+                    </div>
+                </x-card>
+                @endif
+                </x-form>
+                
+                
+        
+        
 
     </div>
 {{-- ITEMS --}}

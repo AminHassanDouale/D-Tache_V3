@@ -88,6 +88,10 @@ Volt::route('/tasks/{task}/edit', 'tasks.edit')->name('tasks.edit');
 
 Route::post('/upload-files/{task}', [FileController::class, 'store'])->name('file.store');
 
+//reportdepartment
+Volt::route('/report/department', 'report.dept');
+Volt::route('/enrigistrement', 'report.enrigistrement');
+
 
 
 

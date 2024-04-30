@@ -126,7 +126,7 @@ new class extends Component {
         </div>
 
         <x-slot:actions>
-            <x-button label="Cancel" link="/products" />
+            <x-button label="Cancel" link="/projects" />
             <x-button label="Save" icon="o-paper-airplane" class="btn-primary" type="submit" spinner="save" />
         </x-slot:actions>
     </x-form>

@@ -79,6 +79,8 @@
             <x-menu-item title="Home" icon="o-chart-pie" link="/home" />
             <x-menu-item title="Projects" icon="o-squares-plus" link="/projects" />
             <x-menu-item title="Tasks" icon="o-document-check" link="/tasks" />
+            <x-menu-item title="Report" icon="o-chart-bar" link="/report/department" />
+            <x-menu-item title="Enrigistrement" icon="s-finger-print" link="/enrigistrement" />
 
             <x-menu-sub title="Warehouse" icon="o-wrench-screwdriver">
                 <x-menu-item title="users" icon="o-user" link="/users" />

@@ -51,7 +51,11 @@ class Project extends Model
         return $this->hasMany(Task::class);
     }
     public function members()
-    {
-        return $this->hasMany(Member::class,'user_id');
-    }
+{
+    return $this->morphMany(Member::class, 'model');
+}
+public function owner()
+{
+    return $this->belongsTo(User::class, 'user_id'); 
+}
 }

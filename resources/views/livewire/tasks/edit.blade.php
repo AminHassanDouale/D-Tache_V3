@@ -12,7 +12,8 @@ use App\Models\Category;
 use App\Models\Priority;
 use Illuminate\Support\Collection;
 use Mary\Traits\Toast;
-
+use App\Mail\TaskCommented;
+use Illuminate\Support\Facades\Mail;
 
 new class extends Component {
     use Toast;
@@ -161,15 +162,15 @@ $commentText = $validatedData['comment'];
 
 
 
-//if ($taskOwner) {
-//    Mail::to($taskOwner->email)->send(new TaskCommented($this->task, $commentText));
-//}
-//
-//
-//if ($taskAssignee && $taskAssignee->id !== $taskOwner->id) {
-//    Mail::to($taskAssignee->email)->send(new TaskCommented($this->task, $commentText));
-//} 
-//    $this->comments = $this->task->comments()->orderBy('created_at')->get();
+if ($taskOwner) {
+    Mail::to($taskOwner->email)->send(new TaskCommented($this->task, $commentText));
+}
+
+
+if ($taskAssignee && $taskAssignee->id !== $taskOwner->id) {
+    Mail::to($taskAssignee->email)->send(new TaskCommented($this->task, $commentText));
+} 
+    $this->comments = $this->task->comments()->orderBy('created_at')->get();
 
     $this->toast('success', 'Comment added successfully.');
 }
@@ -186,6 +187,7 @@ $commentText = $validatedData['comment'];
         $this->toast('error', 'Unable to delete comment.');
     }
 }
+
 
 
 private function logHistory($action, $modelId, $modelType)
@@ -316,7 +318,6 @@ private function logHistory($action, $modelId, $modelType)
                         <td colspan="2" class="text-center">No files available.</td>
                     </tr>
                     @endif
-                    
                     <!-- Add file upload inputs and logic here if needed -->
                 </x-card>
 
@@ -340,6 +341,7 @@ private function logHistory($action, $modelId, $modelType)
                                     <div class="text-xs leading-snug md:leading-normal">{{ $comment->comment }}.</div>
                                 </div>
                                 <div class="text-xs  mt-0.5 text-gray-500">{{ $comment->created_at->diffForHumans() }}</div>
+                                
                             </div>
                         </div>
                         @endforeach
