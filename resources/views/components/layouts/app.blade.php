@@ -110,7 +110,7 @@
 <x-toast />
 
 {{-- Spotlight --}}
-<x-spotlight search-text="Order number, customer, products or any action ..." />
+<x-spotlight search-text="tasks, project ..." />
 
 {{-- Theme Toggle--}}
 <x-theme-toggle class="hidden" />

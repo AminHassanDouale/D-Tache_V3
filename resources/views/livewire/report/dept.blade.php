@@ -1,155 +1,168 @@
 <?php
 
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\Project;
-use App\Models\Priority;
 use App\Models\Task;
+use App\Models\Priority;
 use App\Models\Status;
-use App\Traits\ClearsProperties;
-use App\Traits\ResetsPaginationWhenPropsChanges;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
-use Livewire\Attributes\Url;
+use App\Models\User;
+use App\Models\Category;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
 new class extends Component {
-    use WithPagination, ResetsPaginationWhenPropsChanges, ClearsProperties;
 
-    #[Url]
-    public string $name = '';
+    use WithPagination;
 
-    #[Url]
-    public int $status_id = 0;
-
-    #[Url]
+    public $startDate;
+    public $dueDate;
+    public string $taskName = '';
     public ?int $category_id = 0;
-     #[Url]
-     public ?int $priority_id = 0;
-       #[Url]
-    public string $startDate = '';
+    public ?int $userId = 0; // Assuming user_id is the foreign key in the tasks table
 
-#[Url]
-public string $endDate = '';
 
-    #[Url]
-    public array $sortBy = ['column' => 'name', 'direction' => 'asc'];
 
-    public bool $showFilters = false;
 
-    public function filterCount(): int
+    public $tasks;
+
+public function mount()
+{
+    $this->tasks = Task::query()->get();
+    
+    
+}
+
+    public function reportdept()
     {
-        return ($this->category_id ? 1 : 0) + ($this->status_id ? 1 : 0) + ($this->priority_id ? 1 : 0) + (strlen($this->name) ? 1 : 0);
-    }
+        $tasksQuery = Task::query();
 
-    public function projects(): LengthAwarePaginator
-    {
-        return Task::query()
-            ->with(['status', 'category', 'priority'])
-            ->withAggregate('status', 'name')
-            ->withAggregate('category', 'name')
-            ->withAggregate('priority', 'name')
-            ->when($this->name, fn(Builder $q) => $q->where('name', 'like', "%$this->name%"))
-            ->when($this->status_id, fn(Builder $q) => $q->where('status_id', $this->status_id))
-            ->when($this->category_id, fn(Builder $q) => $q->where('category_id', $this->category_id))
-            ->when($this->priority_id, fn(Builder $q) => $q->where('priority_id', $this->priority_id))
-            ->orderBy(...array_values($this->sortBy))
-            ->paginate(7);
-    }
+// Check if both start date and due date are provided
+if ($this->startDate && $this->dueDate) {
+    $tasksQuery->where(function ($query) {
+        $query->whereBetween('start_date', [$this->startDate, $this->dueDate])
+              ->orWhereBetween('due_date', [$this->startDate, $this->dueDate]);
+    });
+} 
+// Check if only start date is provided
+elseif ($this->startDate) {
+    $tasksQuery->where('start_date', '>=', $this->startDate);
+} 
+// Check if only due date is provided
+elseif ($this->dueDate) {
+    $tasksQuery->where('due_date', '<=', $this->dueDate);
+}
 
-    public function headers(): array
-    {
-        return [
-            ['key' => 'id', 'label' => 'No', 'class' => '', 'sortable' => true],
-            ['key' => 'name', 'label' => 'Name'],
-            ['key' => 'status.name', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
-            ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'],
-            ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name', ],
-        ];
-    }
+// Apply task name search condition if provided
+if ($this->taskName) {
+    $tasksQuery->where('name', 'like', '%' . $this->taskName . '%');
+}
+         // Apply category filter if category ID is provided
+         if ($this->category_id) {
+            $tasksQuery->where('category_id', $this->category_id);
+        }
+          // Apply user filter if user ID is provided
+          if ($this->userId) {
+            $tasksQuery->where('user_id', $this->userId);
+        }
+
+
+
+// Retrieve paginated tasks
+$this->tasks = $tasksQuery->get(); // Change 10 to the desired number of tasks per page
+
+}
 
     public function with(): array
     {
+        $departmentId = Auth::user()->department_id;
+
+        // Query categories where department_id matches the authenticated user's department ID
+        $categories = Category::where('department_id', $departmentId)->get();
+        $users = User::where('department_id', $departmentId)->get();
         return [
-            'headers' => $this->headers(),
-            'projects' => $this->projects(),
-            'statuses' => Status::all(),
-            'priorities' => Priority::all(),
-            'categories' => Category::all(),
-            'filterCount' => $this->filterCount()
+           
+            'tasksCount' => $this->tasks->count(),
+            'categories' => $categories,
+            'users' => $users,
         ];
     }
-}; ?>
+
+}; 
+ ?>
 
 <div>
-    {{--  HEADER  --}}
-    <x-header title="Projects" separator progress-indicator>
-        {{--  SEARCH --}}
-        <x-slot:middle class="!justify-end">
-            <x-input placeholder="Name..." wire:model.live.debounce="name" icon="o-magnifying-glass" clearable />
-        </x-slot:middle>
 
-        {{-- ACTIONS  --}}
-        <x-slot:actions>
-            <x-button
-                label="Filters"
-                icon="o-funnel"
-                :badge="$filterCount"
-                badge-classes="font-mono"
-                @click="$wire.showFilters = true"
-                class="bg-base-300"
-                responsive />
+    <livewire:report.taskcount />
+    <br>
+    <div class="grid gap-8 mt-8 lg:grid-cols-6">
+        <div class="col-span-6 lg:col-span-4">
 
-            <x-button label="Create" icon="o-plus" link="/projects/create" class="btn-primary" responsive />
-        </x-slot:actions>
-    </x-header>
-
-    {{--  TABLE --}}
-    <x-card>
-        @if($projects->count() > 0)
-        <x-table :headers="$headers" :rows="$projects"  :sort-by="$sortBy" with-pagination>
-            @scope('actions', $project)
-            <x-button :link="'/projects/' . $project->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
-
-            @endscope
-        </x-table>
-        @else
-        <div class="flex items-center justify-center gap-10 mx-auto">
-            <div>
-                <img src="/images/no-results.png" width="300" />
-            </div>
-            <div class="text-lg font-medium">
-                Desole {{ Auth::user()->name }}, Pas des Project.
-            </div>
+    <livewire:report.chart  />
         </div>
-    @endif
-    </x-card>
+        <div class="col-span-6 lg:col-span-2">
 
-    {{-- FILTERS --}}
+    <livewire:report.usertask />
+        </div>
+    </div>
+    
+
+    <div class="grid gap-8 mt-8 lg:grid-cols-5">
+        <div class="col-span-6 lg:col-span-4">
     @php
     $config1 = ['altFormat' => 'd/m/Y'];
+    $config2 = ['mode' => 'range'];
 @endphp
- 
+<x-card>
+    <x-form wire:submit.prevent="reportdept">
+        <div class="mb-4" >
+        <x-input label="name" type="text" name="task_name" wire:model="taskName" value="{{ $taskName ?? '' }}" />
+    
+        <x-datepicker label="start date" name="start_date" wire:model="startDate" value="{{ $startDate ?? '' }}" :config="$config1" />
 
-    <x-drawer wire:model="showFilters" title="Filters" class="lg:w-1/3" right separator with-close-button>
-        <div class="grid gap-5" @keydown.enter="$wire.showFilters = false">
-            <x-input label="Name ..." wire:model.live.debounce="name" icon="o-user" inline />
-            <x-datepicker label="Start Date" wire:model="startDate" icon-right="o-calendar" :config="$config1" />
-<x-datepicker label="End Date" wire:model="endDate" icon-right="o-calendar" :config="$config1" />
-
-            <x-select label="Status" :options="$statuses" wire:model.live="status_id" icon="o-map-pin" placeholder="All" placeholder-value="0" inline />
-            <x-select label="Category" :options="$categories" wire:model.live="category_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
-            <x-select label="Priority" :options="$priorities" wire:model.live="priority_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
-          
+        <x-datepicker label="due date" name="due_date" wire:model="dueDate" value="{{ $dueDate ?? '' }}" :config="$config1" />
         </div>
 
-        {{-- ACTIONS --}}
-        <x-slot:actions>
-            <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />
-            <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.showFilters = false" />
-        </x-slot:actions>
-    </x-drawer>
+        <x-select label="Categories" :options="$categories" wire:model.live="category_id" icon="o-map-pin" placeholder="All" placeholder-value="0" inline />
+        <x-select label="Users" :options="$users" wire:model.live="userId" icon="o-user" placeholder="All" placeholder-value="0" inline />
+
+
+
+
+
+        <button type="submit">Search</button>
+    </x-form>
+</x-card>
+        
+    
+<x-card title="Results" separator shadow class="mt-2" >
+    @if ($startDate || $dueDate || $taskName || $category_id || $userId)
+
+    @if ($tasks->isEmpty())
+    <p>No tasks found 😔.</p>
+@else
+    <x-button label="{{ $tasksCount }} 😃" class="btn-success btn-sm" />
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Start Date</th>
+                <th>Due Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($tasks as $task)
+                <tr>
+                    <td>{{ $task->name }}</td>
+                    <td>{{ $task->start_date->format('d/m/y') }}</td>
+                    <td>{{ $task->due_date->format('d/m/y') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    @endif
+    @endif
+
+</x-card>
+</div>
+    </div>
 </div>

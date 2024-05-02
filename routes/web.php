@@ -4,7 +4,9 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\changePasswordController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
+use App\Models\Enrigistrement;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -26,13 +28,7 @@ Volt::route('/', 'welcome');
 Volt::route('/login', 'login')->name('login');
 
 //Logout
-//Route::get('/logout', function () {
-//    auth()->logout();
-//    request()->session()->invalidate();
-//    request()->session()->regenerateToken();
-//
-//    return redirect('/');
-//});
+
 
 Route::middleware('auth')->group(function () {
 //    // home
@@ -91,6 +87,8 @@ Route::post('/upload-files/{task}', [FileController::class, 'store'])->name('fil
 //reportdepartment
 Volt::route('/report/department', 'report.dept');
 Volt::route('/enrigistrement', 'report.enrigistrement');
+//Route::get(/Enrigistrement), 'report.enrigistrement'
+//Route::get('/report/department/search', [ReportController::class, 'reportdept'])->name('reportdepart.search');
 
 
 
@@ -120,4 +118,11 @@ Route::post('/users/{user}/roles', [UserController::class, 'assignRole'])->name(
 Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole'])->name('users.roles.remove');
 Route::post('/users/{user}/permissions', [UserController::class, 'givePermission'])->name('users.permissions');
 Route::delete('/users/{user}/permissions/{permission}', [UserController::class, 'revokePermission'])->name('users.permissions.revoke');
+Route::get('/logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+
+    return redirect('/');
+});
 });
