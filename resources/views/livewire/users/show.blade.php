@@ -79,15 +79,20 @@ new class extends Component {
         </x-card>
 
         {{-- FAVORITES --}}
-        <x-card title="that" separator shadow>
-          <p>bismillak</p>
+        <x-card title="detail" separator shadow>
+            
+            <x-slot:subtitle class="flex flex-col gap-2 p-2 pl-2">
+
+            <x-icon name="o-device-phone-mobile" :label="$user->number" />
+            <x-icon name="o-phone" :label="$user->fix" />
+            </x-slot:subtitle>
         </x-card>
     </div>
 
-    {{-- RECENT ORDERS --}}
+    {{-- RECENT ORDERS 
     <x-card title="Document" separator shadow class="mt-8">
       
-    </x-card>
+    </x-card> --}}
 
 
     <div class="w-full py-12">
@@ -125,13 +130,11 @@ new class extends Component {
                                 <span class="text-sm text-red-400">{{ $message }}</span>
                             @enderror
                     </div>
-                    <div class="pt-5 sm:col-span-6">
                         <button type="submit"
                             class="px-4 py-2 bg-green-500 rounded-md hover:bg-green-700">Assign</button>
-                    </div>
+                    
                     </form>
                 </div>
-                
             </div>
 
         </div>

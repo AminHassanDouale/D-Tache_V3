@@ -61,6 +61,7 @@ new class extends Component {
                 <x-input label="Name" name="name" wire:model="name" />
                 <x-input label="Email" name="email" wire:model="email" />
                 <x-input label="Number" name="number" wire:model="number" />
+                <x-input label="Fix" name="fix" wire:model="fix" />
                 <x-select label="Department" name="department_id" wire:model="department_id" :options="$departments" placeholder="---" />
                 <x-input label="Password" name="password"  type="password" icon="o-key"  />
                 <x-input label="Confirmation Password" name="password_confirmation"  type="password" icon="o-key"  />

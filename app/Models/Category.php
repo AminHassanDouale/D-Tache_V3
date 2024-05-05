@@ -16,6 +16,7 @@ class Category extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+     // protected $fillable = ['id','name', 'deprtment_id', 'user_id'];
 
     protected static function booted()
     {

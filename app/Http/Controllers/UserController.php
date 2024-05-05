@@ -40,6 +40,7 @@ class UserController extends Controller
             'password' => 'required|confirmed',
             'department_id' => 'required|exists:departments,id', 
             'number'=>'required|integer',
+            'fix'=>'required',
 
 
         ]);
@@ -79,6 +80,7 @@ class UserController extends Controller
             'email' => 'string|email|unique:users,email,' . $user->id,
             'avatar' => 'string', // Assuming avatar is a string
             'number' => 'integer', // Assuming number is an integer
+            'fix' => 'string', // Assuming number is an integer
             'department_id' => 'exists:departments,id',
         ]);
     
@@ -86,6 +88,7 @@ class UserController extends Controller
             'name' => $request->name,
             'avatar' => $request->avatar, 
             'number' => $request->number,
+            'fix' => $request->fix,
             'email' => $request->email,
             'department_id' => $request->department_id,
         ];

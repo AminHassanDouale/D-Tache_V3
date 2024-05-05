@@ -8,7 +8,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     #[Reactive]
-    public string $period = '-100 days';
+    public string $period = '-30 days';
 
     public array $chartTasks = [
         'type' => 'line',
@@ -49,6 +49,8 @@ new class extends Component {
         $tasks = Task::query()
         ->selectRaw("DATE_FORMAT(created_at, '%Y-%m-%d') as day, count(*) as total_tasks")
         ->groupBy('day')
+        ->where('user_id', Auth::user()->id)
+        ->where('assigned_id', Auth::user()->id)
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
             ->get();
 

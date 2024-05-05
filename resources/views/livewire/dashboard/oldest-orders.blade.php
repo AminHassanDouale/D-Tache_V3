@@ -9,7 +9,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     #[Reactive]
-    public string $period = '-100 days';
+    public string $period = '-30 days';
 
     public bool $show = false;
     public ?Task $task = null;
@@ -20,6 +20,7 @@ new class extends Component {
     public function orders(): Collection
     {
         return Task::with(['user', 'status'])
+            ->where('user_id', Auth::user()->id)
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
             ->oldest('id')
             ->take(5)
@@ -49,12 +50,15 @@ new class extends Component {
 
 
 <div>
-    <x-card title="Tasks a faire" separator shadow progress-indicator class="mt-10">
+    <x-card title="Les 10 derniers Tasks" separator shadow progress-indicator class="mt-10">
         <x-slot:menu>
             <x-button label="tasks" icon-right="o-arrow-right" link="/tasks" class="btn-ghost btn-sm" />
         </x-slot:menu>
-        <x-table :headers="$headers" :rows="$tasks" @row-click="$wire.preview($event.detail.id)">
-          
+        <x-table :headers="$headers" :rows="$tasks">
+
+            @scope('actions', $task)
+            <x-button :link="'/tasks/' . $task->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
+            @endscope
         </x-table>
 
         @if(!$tasks->count())

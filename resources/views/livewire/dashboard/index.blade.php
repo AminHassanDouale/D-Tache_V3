@@ -19,7 +19,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     #[Url]
-    public string $period = '-100 days';
+    public string $period = '-30 days';
 
     // Available periods
     public function periods(): array
@@ -37,34 +37,7 @@ new class extends Component {
                 'id' => '-30 days',
                 'name' => 'Last 30 days',
             ],
-            [
-                'id' => '-40 days',
-                'name' => 'Last 40 days',
-            ],
-            [
-                'id' => '-50 days',
-                'name' => 'Last 50 days',
-            ],
-            [
-                'id' => '-60 days',
-                'name' => 'Last 60 days',
-            ],
-            [
-                'id' => '-70 days',
-                'name' => 'Last 70 days',
-            ],
-            [
-                'id' => '-80 days',
-                'name' => 'Last 80 days',
-            ],
-            [
-                'id' => '-90 days',
-                'name' => 'Last 90 days',
-            ],
-            [
-                'id' => '-100 days',
-                'name' => 'Last 100 days',
-            ],
+         
         ];
     }
 

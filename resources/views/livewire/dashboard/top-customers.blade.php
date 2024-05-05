@@ -8,13 +8,17 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     #[Reactive]
-    public string $period = '-100 days';
+    public string $period = '-30 days';
 
     public function topCustomers(): Collection
     {
-        return User::with(['tasks' => function ($query) {
-            $query->where('created_at', '>=', Carbon::parse($this->period)->startOfDay());
-        }])->get();
+        $departmentId = Auth::user()->department_id;
+
+return User::where('department_id', $departmentId)
+    ->with(['tasks' => function ($query) {
+        $query->where('created_at', '>=', Carbon::parse($this->period)->startOfDay());
+    }])
+    ->get();
     }
 
     public function with(): array

@@ -12,9 +12,12 @@ new class extends Component {
     use Toast, WithFileUploads;
 
     public User $user;
+    
 
     #[Rule('required')]
     public string $name = '';
+    #[Rule('required')]
+    public string $fix = '';
 
     #[Rule('required|email')]
     public string $email = '';
@@ -42,6 +45,19 @@ new class extends Component {
 
         $this->success('Deleted', redirectTo: '/users');
     }
+    public function updatePassword(): void
+    {
+        // Validate password and confirmation_password
+        $this->validate([
+            'password' => 'required|min:6',
+            'confirmation_password' => 'required|same:password',
+        ]);
+
+        // Update user's password
+        $this->user->update(['password' => bcrypt($this->password)]);
+
+        $this->success('Password updated successfully.');
+    }
 
     public function update(): void
     {
@@ -53,6 +69,7 @@ new class extends Component {
 
         $this->success('Customer updated with success.', redirectTo: '/users');
     }
+    
 
     public function with(): array
     {
@@ -77,7 +94,7 @@ new class extends Component {
                 <x-input label="Name" wire:model="name" name="name" />
                 <x-input label="Email" wire:model="email" name="email"  />
                 <x-input label="number" wire:model="number" name="number" />
-
+                <x-input label="fix" wire:model="fix" name="fix" />
                 <x-select label="Department" wire:model="department_id" :options="$departments" placeholder="---" name="department_id" />
 
                
@@ -91,5 +108,13 @@ new class extends Component {
         <div>
             <img src="/images/edit-form.png" width="300" class="mx-auto" />
         </div>
+
+        <x-card>
+            <x-form wire:submit.prevent='updatePassword'>
+                <x-input label="New Password" type="password" wire:model="password" name="password" />
+                <x-input label="Confirm New Password" type="password" wire:model="confirmation_password" name="confirmation_password" />
+                <x-button label="Update Password"  spinner="updatePassword" type="submit" class="btn-primary" />
+            </x-form>
+        </x-card>
     </div>
 </div>

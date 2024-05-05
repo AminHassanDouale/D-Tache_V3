@@ -1,14 +1,15 @@
 <?php
 
-use App\Models\Task; 
-use Illuminate\Support\Facades\DB; 
+use App\Models\Task;
+use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Volt\Component;
 
 new class extends Component {
     #[Reactive]
-    public string $period = '-100 days';
+    public string $period = '-30 days';
 
     public array $chartCategory = [
         'type' => 'doughnut',
@@ -28,7 +29,7 @@ new class extends Component {
             'labels' => [],
             'datasets' => [
                 [
-                    'label' => 'Sold',
+                    'label' => 'Total',
                     'data' => [],
                 ]
             ]
@@ -38,14 +39,21 @@ new class extends Component {
     #[Computed]
     public function refreshChartCategory(): void
     {
-        $tasks = Task::query()
-            ->selectRaw("count(category_id) as total, category_id")
-            ->where('created_at', '>=', now()->subDays(30)->startOfDay())
-            ->groupBy('category_id')
-            ->get();
+        $departmentId = Auth::user()->department_id;
 
-        Arr::set($this->chartCategory, 'data.labels', $tasks->pluck('category.name'));
-        Arr::set($this->chartCategory, 'data.datasets.0.data', $tasks->pluck('total'));
+$tasks = Task::query()
+    ->selectRaw("count(category_id) as total, category_id")
+    ->where('created_at', '>=', now()->subDays(30)->startOfDay())
+    ->whereHas('category', function ($query) use ($departmentId) {
+        $query->where('department_id', $departmentId);
+    })
+    ->groupBy('category_id')
+    ->get();
+
+$categoryNames = Category::whereIn('id', $tasks->pluck('category_id'))->pluck('name');
+
+Arr::set($this->chartCategory, 'data.labels', $categoryNames);
+Arr::set($this->chartCategory, 'data.datasets.0.data', $tasks->pluck('total'));
     }
 
     public function with(): array
