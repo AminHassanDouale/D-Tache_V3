@@ -59,9 +59,10 @@ new class extends Component {
         return [
             ['key' => 'id', 'label' => 'No', 'class' => '', 'sortable' => true],
             ['key' => 'name', 'label' => 'Name'],
-            ['key' => 'status.name', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
+            ['key' => 'status', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
+
             ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'],
-            ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name', ],
+            ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name', 'class' => 'hidden lg:table-cell' ],
         ];
     }
 
@@ -104,10 +105,12 @@ new class extends Component {
     {{--  TABLE --}}
     <x-card>
         @if($projects->count() > 0)
-        <x-table :headers="$headers" :rows="$projects"  :sort-by="$sortBy" with-pagination>
+        <x-table :headers="$headers" :rows="$projects" link="/projects/{id}/show"  :sort-by="$sortBy" with-pagination>
             @scope('actions', $project)
             <x-button :link="'/projects/' . $project->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
-
+            @endscope
+            @scope('cell_status', $project)
+            <x-badge :value="$project->status->name" :class="$project->status->color" />
             @endscope
         </x-table>
         @else

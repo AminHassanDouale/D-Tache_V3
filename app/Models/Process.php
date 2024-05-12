@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 
-class Task extends Model
+class Process extends Model
 {
     use HasFactory;
 
@@ -16,11 +16,11 @@ class Task extends Model
     protected $primaryKey = 'id';
 
     // Assuming the table name is 'tasks'
-    protected $table = 'tasks';
+    protected $table = 'processes';
 
     // Define the fillable attributes to protect against mass assignment vulnerabilities
     protected $fillable = [
-        'name', 'description', 'assigned_id', 'tags', 'start_date', 'due_date',
+        'name', 'description', 'assigned_id', 'tags', 'signature', 'start_date', 'due_date',
         'category_id', 'status_id', 'project_id', 'department_id', 'user_id', 'priority_id'
     ];
 
@@ -31,10 +31,10 @@ class Task extends Model
     ];
     protected static function booted()
     {
-        static::creating(function ($task) {
-            $task->user_id = Auth::user()->id;
-            $task->department_id = Auth::user()->department_id;
-            $task->status_id = 2;
+        static::creating(function ($project) {
+            $project->user_id = Auth::user()->id;
+            $project->department_id = Auth::user()->department_id;
+            $project->status_id = '1';
         });
     }
 

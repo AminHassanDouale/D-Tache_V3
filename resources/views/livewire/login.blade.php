@@ -22,7 +22,8 @@ class extends Component {
     ]);
 
     if (Auth::attempt($credentials)) {
-        return redirect('/home');
+        return redirect('/tasks');
+      //dd($credentials);
     }
 
     // Handle failed login attempt
@@ -31,8 +32,8 @@ class extends Component {
 
 }; ?>
 
+
 <div class="mx-auto mt-20 md:w-96">
-<alert />
     <x-form wire:submit="login">
         @csrf
         <x-input label="E-mail" name="email" wire:model="email" icon="o-envelope" inline />

@@ -30,6 +30,7 @@
 
     {{-- TinyMCE  --}}
     <script src="https://cdn.tiny.cloud/1/xgqvmnn9bruuovbbe0v3w0wzjsfz0lo4914q1xgdkqdalnvm/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js"></script>
 
     {{-- PhotoSwipe --}}
     <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/umd/photoswipe.umd.min.js"></script>

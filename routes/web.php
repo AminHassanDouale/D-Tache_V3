@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\changePasswordController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ReportController;
@@ -72,12 +73,14 @@ Route::post('change-password', [changePasswordController::class, 'changePassword
 Volt::route('/projects', 'projects.index');
 Volt::route('/projects/create', 'projects.create');
 Volt::route('/projects/{project}/edit', 'projects.edit');
+Volt::route('/projects/{project}/show', 'projects.show');
 
 
 
 //tasks
 Volt::route('/tasks', 'tasks.index');
 Volt::route('/tasks/{task}/edit', 'tasks.edit')->name('tasks.edit');
+Volt::route('/tasks/{task}/show', 'tasks.show')->name('tasks.show');
 
 
 //files
@@ -90,6 +93,8 @@ Volt::route('/enrigistrement', 'report.enrigistrement');
 //Route::get(/Enrigistrement), 'report.enrigistrement'
 //Route::get('/report/department/search', [ReportController::class, 'reportdept'])->name('reportdepart.search');
 
+//
+Volt::route('/processes', 'processes.index');
 
 
 

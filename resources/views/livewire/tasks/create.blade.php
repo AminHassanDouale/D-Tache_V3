@@ -36,12 +36,8 @@ new class extends Component {
 
     public string $label = 'Create';
 
-    
-  
     public function save(): void
-    {   
-        
-        
+    { 
         $this->validate([
         'name' => 'required',
         'description' => 'required',
@@ -76,7 +72,7 @@ new class extends Component {
     $this->dispatch('task-saved', id: $task->id);
     $this->success('Task created.');
     }
-   
+
 }; ?>
 
 <div>

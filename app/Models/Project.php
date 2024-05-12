@@ -37,6 +37,10 @@ class Project extends Model
     {
         return $this->belongsTo(Status::class);
     }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
 
     public function category(): BelongsTo
     {

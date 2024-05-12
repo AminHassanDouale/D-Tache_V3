@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('status')->default(1);
+        Schema::table('tasks', function (Blueprint $table) {
+        $table->foreignId('project_id');
+
         });
     }
 
@@ -21,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('tasks', function (Blueprint $table) {
+            Schema::dropIfExists('tasks');
+
         });
     }
 };

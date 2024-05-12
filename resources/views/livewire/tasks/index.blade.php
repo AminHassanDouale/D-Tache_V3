@@ -13,11 +13,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
+use Mary\Traits\Toast;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
 new class extends Component {
-    use WithPagination, ResetsPaginationWhenPropsChanges, ClearsProperties;
+    use toast, WithPagination, ResetsPaginationWhenPropsChanges, ClearsProperties;
 
     #[Url]
     public string $name = '';
@@ -34,6 +35,29 @@ new class extends Component {
     public array $sortBy = ['column' => 'name', 'direction' => 'asc'];
 
     public bool $showFilters = false;
+    public function changeStatus($taskId)
+    {
+        $task = Task::findOrFail($taskId);
+
+        if ($task->status_id == 5) {
+            $task->update(['status_id' => 2]);
+        } else {
+            $task->update(['status_id' => 5]);
+        }
+
+        $this->toast(
+            type: 'success',
+            title: 'Status Updated!',
+            description: 'Task status has been updated.',
+            position: 'toast-top toast-start',
+            icon: 'o-information-circle',
+            css: 'alert-success',
+            timeout: 3000,
+            redirectTo: null
+
+
+        );
+    }
 
     public function filterCount(): int
     {
@@ -67,7 +91,6 @@ new class extends Component {
             ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'],
             ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name', ],
             ['key' => 'user.name', 'label' => 'Assignee', 'sortBy' => 'user_name', ],
-          //  ['key' => 'stock', 'label' => 'new', 'class' => 'hidden lg:table-cell']
         ];
     }
 
@@ -112,12 +135,15 @@ new class extends Component {
     {{--  TABLE --}}
     <x-card>
         @if($tasks->count() > 0)
-        <x-table :headers="$headers" :rows="$tasks"   :sort-by="$sortBy" with-pagination>
+        <x-table :headers="$headers" :rows="$tasks" link="/tasks/{id}/show"  :sort-by="$sortBy" with-pagination>
             {{--  @scope('cell_preview', $project)
             <x-avatar :image="$project->cover" class="!w-10 !rounded-lg" />
             @endscope --}}
+           
             @scope('actions', $task)
-            <x-button :link="'/tasks/' . $task->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
+            <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
+                <input type="checkbox" wire:model="selectedTasks.{{ $task->id }}"class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" wire:change="changeStatus({{ $task->id }})" {{ $task->status_id == 5 ? 'checked' : '' }}>
+            </td>
             @endscope
 
         </x-table>

@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->string('name');
             $table->foreignId('department_id')->constrained('departments');
             $table->foreignId('user_id')->constrained('users');

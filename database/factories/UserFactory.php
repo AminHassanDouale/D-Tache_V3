@@ -23,7 +23,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'country_id' => Country::inRandomOrder()->first()->id,
+            'department_id' => '1',
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'avatar' => 'https://picsum.photos/200?x=' . rand(),

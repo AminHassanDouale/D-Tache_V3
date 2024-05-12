@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('enrigistrements', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->string('full_name');
             $table->string('adresse');
             $table->date('dob');

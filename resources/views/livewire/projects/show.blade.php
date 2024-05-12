@@ -254,74 +254,60 @@ $this->validate([
 
  
 <div>
-    <div class="grid content-start gap-8">
+    <div>
+        <x-header title="Project"  separator>
+            <x-slot:actions>
+                <x-button label="Edit" link="/projects/{{ $project->id }}/edit"  icon="o-pencil" class="btn-primary" responsive />
+            </x-slot:actions>
+        </x-header>
+    
+        <div class="grid gap-8 lg:grid-cols-2">
+            {{-- INFO --}}
+            <x-card separator shadow>
+                <x-slot:figure>
+                    <img src="https://picsum.photos/500/200" />
+                </x-slot:figure>
+                    <x-slot:title class="pl-2">
+                        <x-menu-item title=" Title: {{ $project->name }}" active />
+                       
+                  
 
-    <x-header :title="$project->name" separator>
-        <x-slot:actions>
-        </x-slot:actions>
-    </x-header>
-    <x-errors title="Oops!" description="Please, fix the errors below." />
+                    </x-slot:title>
+                    <x-slot:subtitle class="flex flex-col gap-2 p-2 pl-2">
+                        <x-menu-item title=" Description: {{ $project->description }}" class="font-bold text-purple-500" />
+                        <x-menu-item title="createdBy : {{ $project->user->name }}"  />
+    
+                    </x-slot:subtitle>
+            </x-card>
+    
+            {{-- FAVORITES --}}
+            <x-card title="detail" separator shadow>
 
-    <div class="grid gap-8 lg:grid-cols-2">
-        {{-- CUSTOMER --}}
-        <x-form wire:submit.prevent="saveProject">
+Status: <p class="{{ $project->status->color }}">  {{ $project->status->name }}.</p>
+Priority: <p class="{{ $project->priority->color }}">{{ $project->priority->name }}.</p>
+<x-tags label="Tags" wire:model="tags" icon="o-home" />
+<br>
+<hr>
+<strong>start_date: {{ $project->start_date->format('d/m/Y') }}</strong> <br>
+<strong>due_date: {{ $project->due_date->format('d/m/Y') }}</strong>
+</x-card>
+        </div>
 
-            @csrf <!-- Add CSRF token -->
-        
-                    {{-- DETAILS --}}
-                    <x-card title="Details" separator>
-                        <div class="grid gap-5 lg:px-3" wire:key="details">
-                            <x-input label="Name" wire:model="name" />
-                            <x-textarea
-                                label="Description"
-                                wire:model="description"
-                                rows="5"
-                                inline
-                            />
-                            <x-choices-offline label="Status" wire:model="status_id" :options="$statuses" single searchable />
-                            <x-choices-offline label="Categories" wire:model="category_id" :options="$categories" single searchable  />
-                            <x-choices-offline label="Priorities" wire:model="priority_id" :options="$priorities" single searchable  />
-                            <!-- Assuming $task->tags returns an array of tag names -->
-                            @php
-            $config1 = ['altFormat' => 'd/m/Y'];
-        @endphp
-                            <x-datepicker label="Start Date" wire:model="start_date" icon-right="o-calendar" :config="$config1" />
-                            <x-datepicker label="Due Date" wire:model="due_date" icon-right="o-calendar" :config="$config1" />
-                            <x-tags label="Tags" wire:model="tags" icon="o-home" />
-        
-                        </div>
-                        <x-slot:actions>
-                            <x-button label="Cancel" link="/projects" />
-                            <x-button label="Save Changes" spinner="saveTask" type="submit" icon="o-paper-airplane" class="btn-primary" />
-                        </x-slot:actions>
-                    </x-card>
-                </x-form>
-                <x-form wire:submit.prevent="addedMember">
-                    <select id="memberSelect" wire:model="selectedUser" class="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <option value="">Sélectionnez membre</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                        @endforeach
-                    </select>
-                    
-                    <x-button wire:click.prevent="addedMember" spinner="addedMember" class="mt-2" icon="o-user-plus" />
-                    <hr>
-                    @if($project->members->count() > 0)
 
+        <div class="grid gap-8 pt-5 lg:grid-cols-2">
+            {{-- INFO --}}
+            <x-card separator shadow>
+                @if($project->members->count() > 0)
                     <div>
-                        <h2>Project Members</h2>
+                        <h2>Project Members: </h2>
                         <ul>
                             @foreach($project->members as $member)
-                                <li>{{ $member->user->name }} - <x-button wire:click="deleteMember({{ $member->id }})" wire:confirm="Are you sure?"  icon="o-trash" spinner responsive >
-                                  
-
-                                </x-button></li> 
-                                
+                                <li>{{ $member->user->name }}</li>
                             @endforeach
                         </ul>
                     </div>
                     @else
-                    <x-card> 
+                    <x-card>
                     <div class="flex items-center justify-center gap-10 mx-auto">
                         <div>
                             <img src="/images/empty-member.png" width="300" />
@@ -332,25 +318,24 @@ $this->validate([
                     </div>
                 </x-card>
                 @endif
-                </x-form>
-                
-                
-        
-        
-
-    </div>
-{{-- ITEMS --}}
-<div class="grid content-start gap-8">
-    <x-card title="tasks" separator>
-           
-        <x-table :headers="$headers" :rows="$tasks" />
-        @if(!$tasks->count())
-        <x-icon name="o-list-bullet" label="Nothing here." class="mt-5 text-gray-400" />
-    @endif
-       
-    </x-card>
-</div>
-
-
+                 
+            </x-card>
+    
+            {{-- FAVORITES --}}
+      
         </div>
+
+        
+    
+        {{-- RECENT ORDERS 
+        <x-card title="Document" separator shadow class="mt-8">
+          
+        </x-card> --}}
+    
+    
+        
+    
+    
+        
+    </div>
 </div>
