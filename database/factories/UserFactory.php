@@ -25,6 +25,8 @@ class UserFactory extends Factory
         return [
             'department_id' => '1',
             'name' => fake()->name(),
+            'number' => fake()->phoneNumber(),
+            'fix' => fake()->phoneNumber(),
             'email' => fake()->unique()->safeEmail(),
             'avatar' => 'https://picsum.photos/200?x=' . rand(),
             'email_verified_at' => now(),

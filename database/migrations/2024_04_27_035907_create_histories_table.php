@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('histories', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->morphs('model');
             $table->dateTime('date');
             $table->string('name');
-            $table->unsignedBigInteger('department_id');
+           // $table->unsignedBigInteger('department_id');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
         });

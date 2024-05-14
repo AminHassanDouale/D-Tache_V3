@@ -14,11 +14,13 @@ new class extends Component {
     {
         $departmentId = Auth::user()->department_id;
 
-return User::where('department_id', $departmentId)
-    ->with(['tasks' => function ($query) {
-        $query->where('created_at', '>=', Carbon::parse($this->period)->startOfDay());
-    }])
-    ->get();
+        return User::where('department_id', $departmentId)
+            ->with([
+                'tasks' => function ($query) {
+                    $query->where('created_at', '>=', Carbon::parse($this->period)->startOfDay());
+                },
+            ])
+            ->get();
     }
 
     public function with(): array
@@ -29,11 +31,10 @@ return User::where('department_id', $departmentId)
     }
 }; ?>
 <div>
-    <x-card title="Equibe" separator shadow>
-        <x-slot:menu>
-        </x-slot:menu>
+    <x-card title="Equipe" separator shadow>
 
-        @foreach($usersWithTasks as $user)
+
+        @foreach ($usersWithTasks as $user)
             <x-list-item :item="$user" sub-value="country.name" link="/users/{{ $user->id }}" no-separator>
                 <h2>{{ $user->name }}</h2>
                 <x-slot:actions>

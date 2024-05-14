@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('members', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->morphs('model'); 
             $table->date('date');
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('department_id')->constrained();
+           // $table->foreignId('department_id')->constrained();
             $table->timestamps();
         });
     }

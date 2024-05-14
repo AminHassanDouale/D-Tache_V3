@@ -25,5 +25,15 @@ class UserSeeder extends Seeder
             'department_id' => '1',
             'avatar' => 'https://picsum.photos/200?x=' . rand(),
         ]);
+        User::create([
+            'name' => 'Mahdi Miad',
+            'number' => '77626508',
+            'email' => 'mahdi.miad@d-money.dj',
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'remember_token' => Str::random(10),
+            'department_id' => '1',
+            'avatar' => 'https://picsum.photos/200?x=' . rand(),
+        ]);
     }
 }

@@ -1,14 +1,21 @@
-<p align="center"><img width="300" src=""></p>
-
-## Introduction
-
-This is the source code of demo D-Tache_V3.
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://d-money.dj/wp-content/uploads/2020/09/D-Money-logo-1.png" width="400"></a></p>
 
 
+ 
 
-## Install
 
-This project is made with Laravel, Livewire, Volt and Mary.
+
+## V3
+- Tested date: 14/05/24
+
+## V3.1
+- Task index must show all my tasks
+- Task view should be a card not disabled input 
+- Upload file at task view is not User friendly 
+- Task description must be Rich Text 
+- Notification must be at top-right only 
+- Task mandatory are (name, Descriptionauto and auto filled will be 1-Status 2- Assigned)
+
 
 
 

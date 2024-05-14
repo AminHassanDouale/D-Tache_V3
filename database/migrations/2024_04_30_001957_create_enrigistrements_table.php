@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('enrigistrements', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->string('full_name');
             $table->string('adresse');
             $table->date('dob');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('attachment_identite');
             $table->string('attachment_formulaire');
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('department_id')->constrained();
+            //$table->foreignId('department_id')->constrained();
             $table->timestamps();
         });
     }

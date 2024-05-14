@@ -17,11 +17,4 @@ use Livewire\Attributes\Renderless;
 use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 
-new class extends Component {
-  
-} ?>
-
-<div>
- this is home Pages 
- <img src="https://cdn.hugeicons.com/icons/task-01-stroke-rounded.svg" alt="task-01" width="24" height="24" />
-</div>
+new class extends Component {}; ?>

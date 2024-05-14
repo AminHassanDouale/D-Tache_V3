@@ -28,8 +28,8 @@ class Project extends Model
     protected static function booted()
     {
         static::creating(function ($project) {
-            $project->user_id = Auth::user()->id;
-            $project->department_id = Auth::user()->department_id;
+            $project->user_id =  Auth::check() ?   Auth::user()->id: 1;
+            $project->department_id =  Auth::check() ?  Auth::user()->department_id : 1;
         });
     }
 

@@ -13,38 +13,33 @@ new class extends Component {
     // General statistics
     public function stats(): array
     {
-        $newCustomers = User::query()
-            ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
-            ->count();
-
         $tasks = Task::query()
-        ->where('user_id', Auth::user()->id)
-        ->where('assigned_id', Auth::user()->id)
+            //->where('user_id', Auth::user()->id)
+            ->where('assigned_id', Auth::user()->id)
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
             ->count();
 
-        $taskpending= Task::query()
-        ->where('user_id', Auth::user()->id)
-        ->where('assigned_id', Auth::user()->id)
-            ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
-            ->where('status_id', '!=', 5)
-            ->count();
-        $taskterminated= Task::query()
-        ->where('user_id', Auth::user()->id)
-        ->where('assigned_id', Auth::user()->id)
-            ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
-            ->where('status_id', '=', 5)
-            ->count();
-            $taskDelayed = Task::query()
-            ->where('user_id', Auth::user()->id)
+        $taskpending = Task::query()
+            //->where('user_id', Auth::user()->id)
             ->where('assigned_id', Auth::user()->id)
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
             ->where('status_id', '!=', 5)
-            ->whereDate('due_date', '<=', Carbon::now()) 
-            ->count(); 
+            ->count();
+        $taskterminated = Task::query()
+            //->where('user_id', Auth::user()->id)
+            ->where('assigned_id', Auth::user()->id)
+            ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
+            ->where('status_id', '=', 5)
+            ->count();
+        $taskDelayed = Task::query()
+            //->where('user_id', Auth::user()->id)
+            ->where('assigned_id', Auth::user()->id)
+            ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
+            ->where('status_id', '!=', 5)
+            ->whereDate('due_date', '<=', Carbon::now())
+            ->count();
 
         return [
-            'newCustomers' => $newCustomers,
             'tasks' => $tasks,
             'taskpending' => $taskpending,
             'taskterminated' => $taskterminated,

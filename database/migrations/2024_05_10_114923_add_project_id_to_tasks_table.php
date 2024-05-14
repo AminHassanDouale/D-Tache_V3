@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-        $table->foreignId('project_id');
+        $table->foreignId('project_id')->nullable();
 
         });
     }
@@ -23,8 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            Schema::dropIfExists('tasks');
-
+            Schema::dropIfExists('project_id'); 
         });
     }
 };

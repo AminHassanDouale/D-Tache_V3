@@ -11,18 +11,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Auth;
 
+
 class Category extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
-     // protected $fillable = ['id','name', 'deprtment_id', 'user_id'];
+   // protected $guarded = ['id'];
+     protected $fillable = ['id','name', 'deprtment_id', 'user_id'];
 
     protected static function booted()
     {
         static::creating(function ($project) {
-            $project->user_id = Auth::user()->id;
-            $project->department_id = Auth::user()->department_id;
+            $project->user_id       = Auth::check() ? Auth::id() : 1 ;
+            $project->department_id = Auth::check() ? Auth::user()->department_id : 1 ;
            
         });
     }

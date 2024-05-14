@@ -37,21 +37,20 @@ new class extends Component {
                 'id' => '-30 days',
                 'name' => 'Last 30 days',
             ],
-         
         ];
     }
 
     public function with(): array
     {
         return [
-            'periods' => $this->periods()
+            'periods' => $this->periods(),
         ];
     }
-} ?>
+}; ?>
 
 <div>
     <x-header title="Dashboard" separator progress-indicator>
-        
+
         <x-slot:actions>
             <x-select :options="$periods" wire:model.live="period" icon="o-calendar" />
         </x-slot:actions>
@@ -65,29 +64,29 @@ new class extends Component {
         <div class="col-span-6 lg:col-span-4">
             <livewire:dashboard.chart-gross :$period />
         </div>
-       
+
 
         {{-- PER CATEGORY --}}
         <div class="col-span-6 lg:col-span-2">
             <livewire:dashboard.chart-category :$period />
         </div>
-       
+
     </div>
 
     <div class="grid gap-8 mt-8 lg:grid-cols-4">
-        {{-- TOP CUSTOMERS --}}
+        {{-- TOP Users --}}
         <div class="col-span-2">
-            <livewire:dashboard.top-customers :$period />
+            <livewire:dashboard.top-users :$period />
         </div>
 
-        {{-- BEST SELLERS  --}}
+        {{-- Latest Projects  --}}
         <div class="col-span-2">
-            <livewire:dashboard.best-sellers :$period />
+            <livewire:dashboard.latest-projects :$period />
         </div>
 
     </div>
 
-    {{-- LATEST ORDERS --}}
-    <livewire:dashboard.oldest-orders :$period />
-     
+    {{-- Latest Tasks --}}
+    <livewire:dashboard.latest-tasks :$period />
+
 </div>

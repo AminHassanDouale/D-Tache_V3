@@ -12,19 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tasks', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->string('name');
-            $table->text('description');
-            $table->integer('assigned_id');
+            $table->text('description')->nullable();
+            $table->integer('assigned_id')->nullable();
             $table->string('tags')->nullable();
-            $table->date('start_date');
-            $table->date('due_date');
-            $table->foreignId('category_id')->constrained('categories');
-            $table->foreignId('status_id')->constrained('statuses');
-          //  $table->foreignId('project_id')->constrained('projects');
-            $table->foreignId('department_id')->constrained('departments');
+            $table->date('start_date')->nullable();
+            $table->date('due_date')->nullable();
+            $table->foreignId('category_id')->nullable()->constrained('categories');
+            $table->foreignId('status_id')->nullable()->constrained('statuses'); 
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('priority_id')->constrained('priorities');
+            $table->foreignId('priority_id')->constrained('priorities')->nullable();
             $table->timestamps();
         });
     }

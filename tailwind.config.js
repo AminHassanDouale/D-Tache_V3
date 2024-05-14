@@ -30,11 +30,11 @@ export default {
             {
                 light: {
                     ...require("daisyui/src/theming/themes")["light"],
-                    primary: '#9b3bf5'
+                    primary: '#10439F'
                 },
                 dark: {
                     ...require("daisyui/src/theming/themes")["dark"],
-                    primary: '#9b3bf5'
+                    primary: '#10439F'
                 }
             }
         ]

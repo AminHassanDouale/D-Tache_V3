@@ -20,9 +20,9 @@ new class extends Component {
                 'legend' => [
                     'position' => 'left',
                     'labels' => [
-                        'usePointStyle' => true
-                    ]
-                ]
+                        'usePointStyle' => true,
+                    ],
+                ],
             ],
         ],
         'data' => [
@@ -31,9 +31,9 @@ new class extends Component {
                 [
                     'label' => 'Total',
                     'data' => [],
-                ]
-            ]
-        ]
+                ],
+            ],
+        ],
     ];
 
     #[Computed]
@@ -41,19 +41,19 @@ new class extends Component {
     {
         $departmentId = Auth::user()->department_id;
 
-$tasks = Task::query()
-    ->selectRaw("count(category_id) as total, category_id")
-    ->where('created_at', '>=', now()->subDays(30)->startOfDay())
-    ->whereHas('category', function ($query) use ($departmentId) {
-        $query->where('department_id', $departmentId);
-    })
-    ->groupBy('category_id')
-    ->get();
+        $tasks = Task::query()
+            ->selectRaw('count(category_id) as total, category_id')
+            ->where('created_at', '>=', now()->subDays(30)->startOfDay())
+            ->whereHas('category', function ($query) use ($departmentId) {
+                $query->where('department_id', $departmentId);
+            })
+            ->groupBy('category_id')
+            ->get();
 
-$categoryNames = Category::whereIn('id', $tasks->pluck('category_id'))->pluck('name');
+        $categoryNames = Category::whereIn('id', $tasks->pluck('category_id'))->pluck('name');
 
-Arr::set($this->chartCategory, 'data.labels', $categoryNames);
-Arr::set($this->chartCategory, 'data.datasets.0.data', $tasks->pluck('total'));
+        Arr::set($this->chartCategory, 'data.labels', $categoryNames);
+        Arr::set($this->chartCategory, 'data.datasets.0.data', $tasks->pluck('total'));
     }
 
     public function with(): array

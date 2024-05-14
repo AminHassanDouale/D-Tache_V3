@@ -15,12 +15,11 @@ new class extends Component {
     public ?Task $task = null;
 
     // Triggers the order preview drawer
-   
 
     public function orders(): Collection
     {
         return Task::with(['user', 'status'])
-            ->where('user_id', Auth::user()->id)
+            ->where('assigned_id', Auth::user()->id)
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
             ->oldest('id')
             ->take(5)
@@ -29,24 +28,18 @@ new class extends Component {
 
     public function headers(): array
     {
-        return [
-            ['key' => 'id', 'label' => '#', 'class' => 'py-4', 'class' => 'hidden lg:table-cell'],
-            ['key' => 'name', 'label' => 'Task'],
-            ['key' => 'user.name', 'label' => 'User'],
-            ['key' => 'status.name', 'label' => 'Status', 'class' => 'hidden lg:table-cell']
-        ];
-
+        return [['key' => 'id', 'label' => '#', 'class' => 'py-4', 'class' => 'hidden lg:table-cell'], ['key' => 'name', 'label' => 'Task'], ['key' => 'user.name', 'label' => 'User'], ['key' => 'status.name', 'label' => 'Status', 'class' => 'hidden lg:table-cell']];
     }
 
     public function with(): array
     {
         return [
             'headers' => $this->headers(),
-            'tasks' => $this->orders() // Use orders() method to fetch tasks
+            'tasks' => $this->orders(), // Use orders() method to fetch tasks
         ];
     }
 };
- ?>
+?>
 
 
 <div>
@@ -57,14 +50,14 @@ new class extends Component {
         <x-table :headers="$headers" :rows="$tasks">
 
             @scope('actions', $task)
-            <x-button :link="'/tasks/' . $task->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
+                <x-button :link="'/tasks/' . $task->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
             @endscope
         </x-table>
 
-        @if(!$tasks->count())
+        @if (!$tasks->count())
             <x-icon name="o-list-bullet" label="Nothing here." class="mt-5 text-gray-400" />
         @endif
     </x-card>
 
-  
+
 </div>

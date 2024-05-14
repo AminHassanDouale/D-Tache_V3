@@ -28,8 +28,8 @@ new class extends Component {
 
     #[Url]
     public ?int $category_id = 0;
-     #[Url]
-     public ?int $priority_id = 0;
+    #[Url]
+    public ?int $priority_id = 0;
 
     #[Url]
     public array $sortBy = ['column' => 'name', 'direction' => 'asc'];
@@ -45,18 +45,7 @@ new class extends Component {
             $task->update(['status_id' => 5]);
         }
 
-        $this->toast(
-            type: 'success',
-            title: 'Status Updated!',
-            description: 'Task status has been updated.',
-            position: 'toast-top toast-start',
-            icon: 'o-information-circle',
-            css: 'alert-success',
-            timeout: 3000,
-            redirectTo: null
-
-
-        );
+        $this->toast(type: 'success', title: 'Status Updated!', description: 'Task status has been updated.', position: 'toast-top toast-end', icon: 'o-information-circle', css: 'alert-success', timeout: 3000, redirectTo: null);
     }
 
     public function filterCount(): int
@@ -70,6 +59,7 @@ new class extends Component {
     public function tasks(): LengthAwarePaginator
     {
         return Task::query()
+            ->where('assigned_id', Auth::user()->id)
             ->with(['status', 'category', 'priority'])
             ->withAggregate('status', 'name')
             ->withAggregate('category', 'name')
@@ -79,19 +69,12 @@ new class extends Component {
             ->when($this->category_id, fn(Builder $q) => $q->where('category_id', $this->category_id))
             ->when($this->priority_id, fn(Builder $q) => $q->where('priority_id', $this->priority_id))
             ->orderBy(...array_values($this->sortBy))
-            ->paginate(7);
+            ->paginate(30);
     }
 
     public function headers(): array
     {
-        return [
-            ['key' => 'preview', 'label' => '', 'class' => 'w-14', 'sortable' => false],
-            ['key' => 'name', 'label' => 'Name'],
-            ['key' => 'status.name', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
-            ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'],
-            ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name', ],
-            ['key' => 'user.name', 'label' => 'Assignee', 'sortBy' => 'user_name', ],
-        ];
+        return [['key' => 'preview', 'label' => '', 'class' => 'w-14', 'sortable' => false], ['key' => 'name', 'label' => 'Name'], ['key' => 'status.name', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'], ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'], ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name'], ['key' => 'user.name', 'label' => 'Assignee', 'sortBy' => 'user_name']];
     }
 
     public function with(): array
@@ -102,15 +85,17 @@ new class extends Component {
             'statuses' => Status::all(),
             'priorities' => Priority::all(),
             'categories' => Category::all(),
-            'filterCount' => $this->filterCount()
+            'filterCount' => $this->filterCount(),
         ];
     }
     protected $listeners = ['task-saved' => '$refresh'];
-
 }; ?>
 
 <div>
     {{--  HEADER  --}}
+
+
+
     <x-header title="Tasks" separator progress-indicator>
         {{--  SEARCH --}}
         <x-slot:middle class="!justify-end">
@@ -119,53 +104,52 @@ new class extends Component {
 
         {{-- ACTIONS  --}}
         <x-slot:actions>
-            <x-button
-                label="Filters"
-                icon="o-funnel"
-                :badge="$filterCount"
-                badge-classes="font-mono"
-                @click="$wire.showFilters = true"
-                class="bg-base-300"
-                responsive />
+            <x-button label="Filters" icon="o-funnel" :badge="$filterCount" badge-classes="font-mono"
+                @click="$wire.showFilters = true" class="bg-base-300" responsive />
 
-                    <livewire:tasks.create />
-            </x-slot:actions>
+            <livewire:tasks.create />
+        </x-slot:actions>
     </x-header>
 
     {{--  TABLE --}}
     <x-card>
-        @if($tasks->count() > 0)
-        <x-table :headers="$headers" :rows="$tasks" link="/tasks/{id}/show"  :sort-by="$sortBy" with-pagination>
-            {{--  @scope('cell_preview', $project)
+        @if ($tasks->count() > 0)
+            <x-table :headers="$headers" :rows="$tasks" link="/tasks/{id}/show" :sort-by="$sortBy" with-pagination>
+                {{--  @scope('cell_preview', $project)
             <x-avatar :image="$project->cover" class="!w-10 !rounded-lg" />
             @endscope --}}
-           
-            @scope('actions', $task)
-            <td class="px-5 py-5 text-sm bg-white border-b border-gray-200">
-                <input type="checkbox" wire:model="selectedTasks.{{ $task->id }}"class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" wire:change="changeStatus({{ $task->id }})" {{ $task->status_id == 5 ? 'checked' : '' }}>
-            </td>
-            @endscope
 
-        </x-table>
+                @scope('actions', $task)
+                    <td class="px-1 py-1 text-sm bg-white border-b border-gray-200">
+                        <input type="checkbox" wire:model="selectedTasks.{{ $task->id }}"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                            wire:change="changeStatus({{ $task->id }})" {{ $task->status_id == 5 ? 'checked' : '' }}>
+                    </td>
+                @endscope
+
+            </x-table>
         @else
-        <div class="flex items-center justify-center gap-10 mx-auto">
-            <div>
-                <img src="/images/no-results.png" width="300" />
+            <div class="flex items-center justify-center gap-10 mx-auto">
+                <div>
+                    <img src="/images/no-results.png" width="300" />
+                </div>
+                <div class="text-lg font-medium">
+                    Desole {{ Auth::user()->name }}, Pas des Tasks.
+                </div>
             </div>
-            <div class="text-lg font-medium">
-                Desole {{ Auth::user()->name }}, Pas des Tasks.
-            </div>
-        </div>
-    @endif
+        @endif
     </x-card>
 
     {{-- FILTERS --}}
     <x-drawer wire:model="showFilters" title="Filters" class="lg:w-1/3" right separator with-close-button>
         <div class="grid gap-5" @keydown.enter="$wire.showFilters = false">
             <x-input label="Name ..." wire:model.live.debounce="name" icon="o-user" inline />
-            <x-select label="Status" :options="$statuses" wire:model.live="status_id" icon="o-map-pin" placeholder="All" placeholder-value="0" inline />
-            <x-select label="Category" :options="$categories" wire:model.live="category_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
-            <x-select label="Priority" :options="$priorities" wire:model.live="priority_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
+            <x-select label="Status" :options="$statuses" wire:model.live="status_id" icon="o-map-pin" placeholder="All"
+                placeholder-value="0" inline />
+            <x-select label="Category" :options="$categories" wire:model.live="category_id" icon="o-flag" placeholder="All"
+                placeholder-value="0" inline />
+            <x-select label="Priority" :options="$priorities" wire:model.live="priority_id" icon="o-flag" placeholder="All"
+                placeholder-value="0" inline />
         </div>
 
         {{-- ACTIONS --}}

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('files', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->morphs('model'); 
             $table->string('filename');
             $table->string('file_path');
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('type');
             $table->integer('size');
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('department_id')->constrained();
+           // $table->foreignId('department_id')->constrained();
             $table->timestamps();
         });
     }

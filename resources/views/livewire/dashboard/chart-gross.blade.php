@@ -18,16 +18,16 @@ new class extends Component {
             'maintainAspectRatio' => false,
             'scales' => [
                 'x' => [
-                    'display' => false
+                    'display' => false,
                 ],
                 'y' => [
-                    'display' => false
-                ]
+                    'display' => false,
+                ],
             ],
             'plugins' => [
                 'legend' => [
                     'display' => false,
-                ]
+                ],
             ],
         ],
         'data' => [
@@ -39,18 +39,18 @@ new class extends Component {
                     'tension' => '0.1',
                     'fill' => true,
                 ],
-            ]
-        ]
+            ],
+        ],
     ];
 
     #[Computed]
     public function refreshChartTasks(): void
     {
         $tasks = Task::query()
-        ->selectRaw("DATE_FORMAT(created_at, '%Y-%m-%d') as day, count(*) as total_tasks")
-        ->groupBy('day')
-        ->where('user_id', Auth::user()->id)
-        ->where('assigned_id', Auth::user()->id)
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m-%d') as day, count(*) as total_tasks")
+            ->groupBy('day')
+            //->where('user_id', Auth::user()->id)
+            ->where('assigned_id', Auth::user()->id)
             ->where('created_at', '>=', Carbon::parse($this->period)->startOfDay())
             ->get();
 

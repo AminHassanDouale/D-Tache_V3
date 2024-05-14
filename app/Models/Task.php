@@ -32,9 +32,8 @@ class Task extends Model
     protected static function booted()
     {
         static::creating(function ($task) {
-            $task->user_id = Auth::user()->id;
-            $task->department_id = Auth::user()->department_id;
-            $task->status_id = 2;
+            $task->user_id = Auth::check() ? Auth::user()->id : 1;
+            $task->department_id = Auth::check() ? Auth::user()->department_id : 1;
         });
     }
 

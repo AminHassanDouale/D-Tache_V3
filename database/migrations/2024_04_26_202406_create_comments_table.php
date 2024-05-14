@@ -16,7 +16,7 @@ return new class extends Migration
             $table->morphs('model'); // This creates model_id and model_type
             $table->text('comment');
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('department_id')->constrained();
+           // $table->foreignId('department_id')->constrained();
             $table->date('date');
             $table->timestamps();
         });
