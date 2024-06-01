@@ -44,15 +44,7 @@ class User extends Authenticatable
         return $this->belongsTo(Department::class);
     }
 
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class);
-    }
-
-    public function likes(): BelongsToMany
-    {
-        return $this->BelongsToMany(Product::class, 'products_likes');
-    }
+   
 
     protected function firstName(): Attribute
     {
@@ -65,6 +57,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
     public function tasks()
     {
         return $this->hasMany(Task::class,'assigned_id');
@@ -73,6 +69,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Member::class,'user_id');
     }
-    
+    public function likes(): BelongsToMany
+    {
+        return $this->belongsToMany(Document::class, 'documents_likes', 'user_id', 'document_id');
+    }
+
 }
-    

@@ -10,7 +10,7 @@ use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 use Mary\Traits\Toast;
 use Mary\Traits\WithMediaSync;
-use App\Models\Enrigistrement; 
+use App\Models\Enrigistrement;
 
 
 

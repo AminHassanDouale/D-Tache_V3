@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\File;
 use App\Http\Requests\StoreFileRequest;
 use App\Http\Requests\UpdateFileRequest;
+use App\Models\Document;
+use App\Models\History;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FileController extends Controller
 {
@@ -77,7 +80,66 @@ class FileController extends Controller
         }
 
 
-        return redirect()->route('tasks.edit', ['task' => $task->id]);
+        return redirect()->route('tasks.show', ['task' => $task->id]);
+    
+    }
+
+    public function documentfile(Request $request, Document $document)
+    {
+        $uploadedFiles = $request->file('uploadedFiles');
+        foreach ($uploadedFiles as $file) {
+            $fileName = auth()->id() . '-document-' . Carbon::today()->format('Y-m-d_H-i'). '-' . $file->getClientOriginalName();
+
+            $filePath = $file->storeAs('documents', $fileName, 'public');
+
+            if ($filePath) {
+                File::create([
+                    'model_id' => $document->id,
+                    'model_type' => Document::class,
+                    'filename' => $fileName, 
+                    'file_path' => $filePath,
+                    'name' => $file->getClientOriginalName(), 
+                    'type' => $file->getClientOriginalExtension(),
+                    'size' => $file->getSize(),
+                    'user_id' => auth()->id(),
+                    'department_id' => auth()->user()->department_id,
+                ]);
+                History::create([
+                    'action' => 'file added',
+                    'model_id' => $document->id,
+                    'model_type' => Document::class,
+                    'date' => now(),
+                    'name' => $document->name, 
+                    'department_id' => Auth::user()->department_id,
+                    'user_id' => Auth::id(),
+                ]);
+
+                session()->flash('toast', [
+                    'type' => 'success',
+                    'title' => 'File Added!',
+                    'description' => null,
+                    'position' => 'toast-top toast-start',
+                    'icon' => 'o-check-circle',
+                    'css' => 'alert-success',
+                    'timeout' => 3000,
+                    'redirectTo' => null
+                ]);
+            } else {
+                session()->flash('toast', [
+                    'type' => 'error',
+                    'title' => 'Error Uploading File!',
+                    'description' => 'Could not move the file to the destination directory.',
+                    'position' => 'toast-top toast-start',
+                    'icon' => 'o-close-circle',
+                    'css' => 'alert-danger',
+                    'timeout' => 3000,
+                    'redirectTo' => null
+                ]);
+            }
+        }
+
+
+        return redirect()->route('documents.show', ['document' => $document->id]);
     
     }
 

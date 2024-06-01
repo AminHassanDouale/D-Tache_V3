@@ -51,7 +51,7 @@ new class extends Component {
             ->when($this->category_id, fn(Builder $q) => $q->where('category_id', $this->category_id))
             ->when($this->priority_id, fn(Builder $q) => $q->where('priority_id', $this->priority_id))
             ->orderBy(...array_values($this->sortBy))
-            ->paginate(7);
+            ->paginate(100);
     }
 
     public function headers(): array
@@ -78,16 +78,14 @@ new class extends Component {
         ];
     }
 }; ?>
-
 <div>
-    {{--  HEADER  --}}
     <x-header title="Projects" separator progress-indicator>
-        {{--  SEARCH --}}
+        {{-- SEARCH --}}
         <x-slot:middle class="!justify-end">
             <x-input placeholder="Name..." wire:model.live.debounce="name" icon="o-magnifying-glass" clearable />
         </x-slot:middle>
 
-        {{-- ACTIONS  --}}
+        {{-- ACTIONS --}}
         <x-slot:actions>
             <x-button
                 label="Filters"
@@ -101,16 +99,23 @@ new class extends Component {
             <x-button label="Create" icon="o-plus" link="/projects/create" class="btn-primary" responsive />
         </x-slot:actions>
     </x-header>
-
-    {{--  TABLE --}}
     <x-card>
         @if($projects->count() > 0)
-        <x-table :headers="$headers" :rows="$projects" link="/projects/{id}/show"  :sort-by="$sortBy" with-pagination>
+        <x-table :headers="$headers" :rows="$projects" link="/projects/{id}/show" :sort-by="$sortBy" with-pagination>
             @scope('actions', $project)
             <x-button :link="'/projects/' . $project->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
             @endscope
             @scope('cell_status', $project)
             <x-badge :value="$project->status->name" :class="$project->status->color" />
+            @endscope 
+            @scope('cell_tasks', $project)
+            <ul>
+                @forelse($project->tasks as $task)
+                    <li>{{ $task->name }}</li>
+                @empty
+                    <li>No tasks</li>
+                @endforelse
+            </ul>
             @endscope
         </x-table>
         @else
@@ -119,26 +124,9 @@ new class extends Component {
                 <img src="/images/no-results.png" width="300" />
             </div>
             <div class="text-lg font-medium">
-                Desole {{ Auth::user()->name }}, Pas des Project.
+                Désolé {{ Auth::user()->name }}, Pas de Projets.
             </div>
         </div>
-    @endif
+        @endif
     </x-card>
-
-    {{-- FILTERS --}}
-    <x-drawer wire:model="showFilters" title="Filters" class="lg:w-1/3" right separator with-close-button>
-        <div class="grid gap-5" @keydown.enter="$wire.showFilters = false">
-            <x-input label="Name ..." wire:model.live.debounce="name" icon="o-user" inline />
-            <x-select label="Status" :options="$statuses" wire:model.live="status_id" icon="o-map-pin" placeholder="All" placeholder-value="0" inline />
-            <x-select label="Category" :options="$categories" wire:model.live="category_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
-            <x-select label="Priority" :options="$priorities" wire:model.live="priority_id" icon="o-flag" placeholder="All" placeholder-value="0" inline />
-          
-        </div>
-
-        {{-- ACTIONS --}}
-        <x-slot:actions>
-            <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />
-            <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.showFilters = false" />
-        </x-slot:actions>
-    </x-drawer>
 </div>

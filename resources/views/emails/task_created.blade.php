@@ -96,8 +96,7 @@
 
                         <p
                             style="font-size: 11px; line-height: 20px; font-family: 'Helvetica', Arial, sans-serif; font-weight: 400; text-decoration: none; color: #000000;">
-                            D-Tache Notification, <a class="link" style="text-decoration: underline;" target="_blank"
-                                href="#"><u>Click here</u></a> à voir dans le site D-Taches
+                            D-Tache Notification, 
                         </p>
 
                     </td>
@@ -142,11 +141,11 @@
 
                         <h1
                             style="font-size: 20px; line-height: 24px; font-family: 'Helvetica', Arial, sans-serif; font-weight: 600; text-decoration: none; color: #000000;">
-                            Salam Aleikoum, {{ $assigned->name }}</h1>
+                            Salam Aleikoum, </h1>
 
                         <p
                             style="font-size: 15px; line-height: 24px; font-family: 'Helvetica', Arial, sans-serif; font-weight: 400; text-decoration: none; color: #919293;">
-                            Veuillez recevoir cet email comme notification de la tâche intitulé "{{ $task->name }}", Cree par {{ $creator->name }} et appartient au Projet <span class="text-underline">{{ $project->name }}</span>.
+                            Veuillez recevoir cet email comme notification de la tâche intitulé "", Cree par et appartient au Projet <span class="text-underline"></span>.
                             Merci
 
 

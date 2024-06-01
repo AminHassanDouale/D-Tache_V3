@@ -16,7 +16,7 @@ class File extends Model
         'size',
         'user_id',
         'department_id',
-        'model_id', 
-        'model_type', 
+        'model_id',
+        'model_type',
     ];
 }

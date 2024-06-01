@@ -16,7 +16,8 @@
 
     {{-- ChartJS --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+    <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
     {{-- Flatpickr  --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -29,8 +30,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.1/Sortable.min.js"></script>
 
     {{-- TinyMCE  --}}
-    <script src="https://cdn.tiny.cloud/1/xgqvmnn9bruuovbbe0v3w0wzjsfz0lo4914q1xgdkqdalnvm/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/kecao1uumzo3qt3o90pztdtlp82b4ctv8tkvsrjgcx34ock5/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
     {{-- PhotoSwipe --}}
     <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/umd/photoswipe.umd.min.js"></script>
@@ -79,6 +79,7 @@
 
             <x-menu-item title="Home" icon="o-chart-pie" link="/home" />
             <x-menu-item title="Projects" icon="o-squares-plus" link="/projects" />
+            <x-menu-item title="Documents" icon="o-folder-minus" link="/documents" />
             <x-menu-item title="Tasks" icon="o-document-check" link="/tasks" />
             <x-menu-item title="Report" icon="o-chart-bar" link="/report/department" />
             <x-menu-item title="Enrigistrement" icon="s-finger-print" link="/enrigistrement" />
@@ -116,4 +117,5 @@
 {{-- Theme Toggle--}}
 <x-theme-toggle class="hidden" />
 </body>
+
 </html>

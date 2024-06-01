@@ -5,10 +5,14 @@ use Livewire\Attributes\Layout;
 use App\Models\Note;
 use App\Models\Task;
 use App\Models\Status;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Project;
 use App\Models\File;
+use App\Models\History;
 use App\Models\Category;
+use App\Mail\TaskCreatedMail;
+
 use App\Models\Priority;
 use Illuminate\Support\Collection;
 use Mary\Traits\Toast;
@@ -70,6 +74,7 @@ new class extends Component {
     {
         return User::orderBy('name')->get();
     }
+    
 
     public function saveTask()
 {
@@ -188,6 +193,209 @@ if ($taskAssignee && $taskAssignee->id !== $taskOwner->id) {
     }
 }
 
+//  update task name //
+public function changeTaskName()
+{
+    
+
+    $this->task->update(['name' => $this->name]);
+
+    
+
+    $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Nom Du Task!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Name updated', $this->task->id, Task::class);
+
+}
+
+// update Task Description 
+public function changeTaskDescription()
+{
+    $this->task->update(['description' => $this->description]);
+
+
+    $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Description!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Description updated', $this->task->id, Task::class);
+
+}
+
+
+// update task status //
+public function changeStatus()
+    {
+
+        $this->task->update(['status_id' => $this->status_id]);
+
+
+        $this->toast(
+            type: 'warning',
+            title: 'Mise A jour,le Status !',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Status updated', $this->task->id, Task::class);
+
+
+    }
+// task priority_id //
+
+    public function changePriority()
+    {
+        $this->task->update(['priority_id' => $this->priority_id]);
+
+        $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Priorite!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Priority updated', $this->task->id, Task::class);
+
+    }
+
+
+    // update task start update  //
+
+    
+    public function updateStartDate($newStartDate)
+{
+    $startDate = Carbon::parse($newStartDate);
+
+    $this->task->update(['start_date' => $startDate]);
+
+
+    $this->toast(
+        type: 'warning',
+        title: 'Start Date Updated!',
+        description: null,
+        position: 'toast-bottom toast-end',
+        icon: 'o-information-circle',
+        css: 'alert-warning',
+        timeout: 3000,
+        redirectTo: null
+    );
+
+    $this->logHistory('Start date updated', $this->task->id, Task::class);
+}
+
+
+
+
+   // update task  due date  // 
+
+public function updateEndDate($newEndDate)
+{
+    $endDate = Carbon::parse($newEndDate);
+    
+    $this->task->update(['due_date' => $endDate]);
+
+
+    $this->toast(
+        type: 'warning',
+        title: 'End Date Updated!',
+        description: null,
+        position: 'toast-bottom toast-end',
+        icon: 'o-information-circle',
+        css: 'alert-warning',
+        timeout: 3000,
+        redirectTo: null
+    );
+
+    $this->logHistory('End date updated', $this->task->id, Task::class);
+}
+
+// update Task Assigned //
+public function changeAssignee()
+{
+    $this->task->update(['assigned_id' => $this->assigned_id]);
+    $assigned = User::findOrFail($this->assigned_id);
+    $creator = auth()->user();
+
+    // Corrected line: Replace '$task' with '$this->task'
+    Mail::to($assigned->email)->send(new TaskCreatedMail([
+        'task' => $this->task, // Corrected variable
+        'assigned' => $assigned,
+        'creator' => $creator,
+        'project' => $this->task->project, // Assuming $this->task->project is accessible
+    ]));
+    
+    $this->toast(
+        type: 'warning',
+        title: 'Mise A jour, Assignee!',
+        description: null,
+        position: 'toast-bottom toast-end',
+        icon: 'o-information-circle',
+        css: 'alert-warning',
+        timeout: 3000,
+        redirectTo: null
+    );
+    $this->logHistory('Assignee updated', $this->task->id, Task::class);
+}
+
+// update task priority_id //
+
+public function changeCategory()
+    {
+        $this->task->update(['category_id' => $this->category_id]);
+
+        $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Priorite!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Category updated', $this->task->id, Task::class);
+
+    }
+//  update task project_id  //
+
+    public function changeProject()
+    {
+        $this->task->update(['project_id' => $this->project_id]);
+
+        $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Project!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Project updated', $this->task->id, Task::class);
+
+    }
+
 
 
 private function logHistory($action, $modelId, $modelType)
@@ -216,45 +424,99 @@ private function logHistory($action, $modelId, $modelType)
     }
 }; ?>
 <div>
-    <x-header :title="$task->name" separator>
-        <x-slot:actions>
-        </x-slot:actions>
-    </x-header>
 
-    <x-form wire:submit.prevent="saveTask">
 
-    @csrf <!-- Add CSRF token -->
+
+   
 
         <div class="grid gap-2 lg:grid-cols-2">
             {{-- DETAILS --}}
-            <x-card title="Details" separator>
                 <div class="grid gap-5 lg:px-3" wire:key="details">
-                    <x-input label="Name" wire:model="name" />
+                                                                <!-- name update views  -->
+<x-card>
+                    <x-input label="Task Name" wire:model.defer="name" placeholder="Enter task name" :value="$task->name" wire:keydown.enter="changeTaskName" />
+</x-card>
+                                                                    <!-- Description update views  -->
+        
+
+                        <form wire:submit.prevent="changeTaskDescription">
+
                     <x-textarea
                         label="Description"
                         wire:model="description"
-                        rows="5"
-                        inline
+                        rows="5" 
+                        inline 
                     />
-                    <x-choices-offline label="Status" wire:model="status_id" :options="$statuses" single searchable />
-                    <x-choices-offline label="Assigned" wire:model="assigned_id" :options="$users" single searchable />
-                    <x-choices-offline label="Categories" wire:model="category_id" :options="$categories" single searchable  />
-                    <x-choices-offline label="projects" wire:model="project_id" :options="$projects" single searchable  />
-                    <!-- Assuming $task->tags returns an array of tag names -->
-                    @php
-    $config1 = ['altFormat' => 'd/m/Y'];
-@endphp
-                    <x-datepicker label="Start Date" wire:model="start_date" icon-right="o-calendar" :config="$config1" />
-                    <x-datepicker label="Due Date" wire:model="due_date" icon-right="o-calendar" :config="$config1" />
-                    <x-tags label="Tags" wire:model="tags" icon="o-home" />
+                    <div class="mt-4">
+                        <x-button type="submit" class="bg-blue-500">Update Description</x-button>
+                    </div>
+                </form>
+
+                                                            <!-- Status update views  -->
+                                                            <label for="">Status</label>         
+
+                <select wire:model="status_id" label="Status" wire:change="changeStatus" id="status" name="status" class="block w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow hover:border-dotted" >
+                    @foreach($statuses as $status)
+                        <option value="{{ $status->id }}">{{ $status->name }}</option>
+                    @endforeach
+                </select>
+                                                            <!-- Priority update views  -->
+                                                            <label for="">Priority</label>         
+
+             <select wire:model="priority_id" label="Priority" wire:change="changePriority" id="priority" name="priority" class="block w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow hover:border-dotted" >
+                    @foreach($priorities as $priority)
+                        <option value="{{ $priority->id }}">{{ $priority->name }}</option>
+                    @endforeach
+                </select>
+                                                            <!-- Start_date update views  -->
+                                                            
+
+                <div class="p-6 mt-6 bg-white rounded-lg shadow">
+                @php
+                $config1 = ['altFormat' => 'd/m/Y'];
+               @endphp
+                 <x-datepicker label="Start Date" wire:model.defer="start_date"  wire:change="updateStartDate($event.target.value)" :config="$config1" />
+            </div>
+                                                        <!-- Due_date update views  -->
+
+            <div class="p-6 mt-6 bg-white rounded-lg shadow">
+                <x-datepicker label="Due Date" wire:model.defer="due_date" wire:change="updateEndDate($event.target.value)" :config="$config1" />
+            </div>
+
+                                                         <!-- Assignee update views  -->
+                                                         <label for="">Assigned</label>         
+
+
+            <select wire:model="assignee_id" label="Assigned" wire:change="changeAssignee" id="assignee" name="assignee" class="w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow p-8block hover:border-dotted" >
+                @foreach($users as $user)
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </select>
+
+                                            <!-- category update views  -->
+
+                                            <label for="">Category</label>         
+
+
+            <select wire:model="category_id" label="Category" wire:change="changeCategory" id="category" name="category" class="block w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow hover:border-dotted" >
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                @endforeach
+            </select> 
+            
+                                <!-- project update views  -->
+                                <label for="">Project</label>         
+
+
+            <select wire:model="project_id" label="Project" wire:change="changeProject" id="project" name="project" class="block w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow hover:border-dotted" >
+                @foreach($projects as $project)
+                    <option value="{{ $project->id }}">{{ $project->name }}</option>
+                @endforeach
+            </select>
+                  
 
                 </div>
-                <x-slot:actions>
-                    <x-button label="Cancel" link="/tasks" />
-                    <x-button label="Save Changes" spinner="saveTask" type="submit" icon="o-paper-airplane" class="btn-primary" />
-                </x-slot:actions>
-            </x-form>
-            </x-card>
+               
             
 
             <div class="grid content-start gap-8">
@@ -263,7 +525,7 @@ private function logHistory($action, $modelId, $modelType)
                         @csrf
                         <input wire:model="uploadedFiles" type="file" name="uploadedFiles[]" multiple>
                      <div>
-                        <button type="submit" class="p-2 bg-green-200 rounded ">Upload Files</button>
+                        <button type="submit" class="p-2 bg-green-200 rounded">Upload Files</button>
                      </div>
                     </form>
 
@@ -271,6 +533,7 @@ private function logHistory($action, $modelId, $modelType)
                     @foreach ($task->file as $file)
                     <div class="flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
                         <div class="flex items-center">
+                            
                         <div class="">
                             <img
                             class="h-[83px] w-[83px] rounded-lg"

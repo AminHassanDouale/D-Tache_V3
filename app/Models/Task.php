@@ -39,7 +39,7 @@ class Task extends Model
 
     public function status(): BelongsTo
     {
-        return $this->belongsTo(Status::class);
+        return $this->belongsTo(Status::class, 'status_id');
     }
 
     public function category(): BelongsTo
@@ -71,6 +71,10 @@ class Task extends Model
    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    public function assignee(): BelongsTo
+    {
+        return $this->belongsTo(User::class,'assigned_id');
     }
     public function tasks()
     {

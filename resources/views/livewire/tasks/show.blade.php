@@ -5,10 +5,14 @@ use Livewire\Attributes\Layout;
 use App\Models\Note;
 use App\Models\Task;
 use App\Models\Status;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Project;
 use App\Models\File;
+use App\Models\History;
 use App\Models\Category;
+use App\Mail\TaskCreatedMail;
+
 use App\Models\Priority;
 use Illuminate\Support\Collection;
 use Mary\Traits\Toast;
@@ -188,6 +192,209 @@ if ($taskAssignee && $taskAssignee->id !== $taskOwner->id) {
     }
 }
 
+//  update task name //
+public function changeTaskName()
+{
+    
+
+    $this->task->update(['name' => $this->name]);
+
+    
+
+    $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Nom Du Task!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Name updated', $this->task->id, Task::class);
+
+}
+
+// update Task Description 
+public function changeTaskDescription()
+{
+    $this->task->update(['description' => $this->description]);
+
+
+    $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Description!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Description updated', $this->task->id, Task::class);
+
+}
+
+
+// update task status //
+public function changeStatus()
+    {
+
+        $this->task->update(['status_id' => $this->status_id]);
+
+
+        $this->toast(
+            type: 'warning',
+            title: 'Mise A jour,le Status !',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Status updated', $this->task->id, Task::class);
+
+
+    }
+// task priority_id //
+
+    public function changePriority()
+    {
+        $this->task->update(['priority_id' => $this->priority_id]);
+
+        $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Priorite!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Priority updated', $this->task->id, Task::class);
+
+    }
+
+
+    // update task start update  //
+
+    
+    public function updateStartDate($newStartDate)
+{
+    $startDate = Carbon::parse($newStartDate);
+
+    $this->task->update(['start_date' => $startDate]);
+
+
+    $this->toast(
+        type: 'warning',
+        title: 'Start Date Updated!',
+        description: null,
+        position: 'toast-bottom toast-end',
+        icon: 'o-information-circle',
+        css: 'alert-warning',
+        timeout: 3000,
+        redirectTo: null
+    );
+
+    $this->logHistory('Start date updated', $this->task->id, Task::class);
+}
+
+
+
+
+   // update task  due date  // 
+
+public function updateEndDate($newEndDate)
+{
+    $endDate = Carbon::parse($newEndDate);
+    
+    $this->task->update(['due_date' => $endDate]);
+
+
+    $this->toast(
+        type: 'warning',
+        title: 'End Date Updated!',
+        description: null,
+        position: 'toast-bottom toast-end',
+        icon: 'o-information-circle',
+        css: 'alert-warning',
+        timeout: 3000,
+        redirectTo: null
+    );
+
+    $this->logHistory('End date updated', $this->task->id, Task::class);
+}
+
+// update Task Assigned //
+public function changeAssignee()
+{
+    $this->task->update(['assigned_id' => $this->assigned_id]);
+    $assigned = User::findOrFail($this->assigned_id);
+    $creator = auth()->user();
+
+    // Corrected line: Replace '$task' with '$this->task'
+    Mail::to($assigned->email)->send(new TaskCreatedMail([
+        'task' => $this->task, // Corrected variable
+        'assigned' => $assigned,
+        'creator' => $creator,
+        'project' => $this->task->project, // Assuming $this->task->project is accessible
+    ]));
+    
+    $this->toast(
+        type: 'warning',
+        title: 'Mise A jour, Assignee!',
+        description: null,
+        position: 'toast-bottom toast-end',
+        icon: 'o-information-circle',
+        css: 'alert-warning',
+        timeout: 3000,
+        redirectTo: null
+    );
+    $this->logHistory('Assignee updated', $this->task->id, Task::class);
+}
+
+// update task priority_id //
+
+public function changeCategory()
+    {
+        $this->task->update(['category_id' => $this->category_id]);
+
+        $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Priorite!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Category updated', $this->task->id, Task::class);
+
+    }
+//  update task project_id  //
+
+    public function changeProject()
+    {
+        $this->task->update(['project_id' => $this->project_id]);
+
+        $this->toast(
+            type: 'warning',
+            title: 'Mise A jour, Project!',
+            description: null,                  // optional (text)
+            position: 'toast-bottom toast-end',    // optional (daisyUI classes)
+            icon: 'o-information-circle',       // Optional (any icon)
+            css: 'alert-warning',                  // Optional (daisyUI classes)
+            timeout: 3000,                      // optional (ms)
+            redirectTo: null                    // optional (uri)
+        );
+        $this->logHistory('Project updated', $this->task->id, Task::class);
+
+    }
+
 
 
 private function logHistory($action, $modelId, $modelType)
@@ -216,157 +423,129 @@ private function logHistory($action, $modelId, $modelType)
     }
 }; ?>
 <div>
-    <x-header :title="$task->name" separator>
-        <x-slot:actions>
-            <x-button label="Edit" link="/tasks/{{ $task->id }}/edit"  icon="o-pencil" class="btn-primary" responsive />
-        </x-slot:actions>
-    </x-header>
-
-    <x-form wire:submit.prevent="saveTask">
-
-    @csrf <!-- Add CSRF token -->
-
-        <div class="grid gap-2 lg:grid-cols-2">
-            {{-- DETAILS --}}
-            <x-card title="Details" separator>
-                <div class="grid gap-5 lg:px-3" wire:key="details">
-                    <x-input label="Name" wire:model="name" disabled />
-                    <x-textarea
-                        label="Description"
-                        wire:model="description"
-                        rows="5"
-                        inline disabled
-                    />
-                    <x-choices-offline label="Status" wire:model="status_id" :options="$statuses" single searchable disabled />
-                    <x-choices-offline label="Assigned" wire:model="assigned_id" :options="$users" single searchable disabled />
-                    <x-choices-offline label="Categories" wire:model="category_id" :options="$categories" single searchable disabled  />
-                    <x-choices-offline label="projects" wire:model="project_id" :options="$projects" single searchable disabled  />
-                    <!-- Assuming $task->tags returns an array of tag names -->
-                    @php
-    $config1 = ['altFormat' => 'd/m/Y'];
-@endphp
-                    <x-datepicker label="Start Date" wire:model="start_date" icon-right="o-calendar" :config="$config1" disabled />
-                    <x-datepicker label="Due Date" wire:model="due_date" icon-right="o-calendar" :config="$config1" disabled />
-                    <x-tags label="Tags" wire:model="tags" icon="o-home" />
-
-                </div>
-                <x-slot:actions>
-                    <x-button label="Cancel" link="/tasks" />
-                    <x-button label="Save Changes" spinner="saveTask" type="submit" icon="o-paper-airplane" class="btn-primary" />
-                </x-slot:actions>
-            </x-form>
-            </x-card>
+    <main class="p-6 bg-gray-100">
+        <div class="mx-auto max-w-7xl">
+            <h1 class="mb-4 text-2xl font-bold">Documents</h1>
             
-
-            <div class="grid content-start gap-8">
-                <x-card title="Files" separator>
-                    <form action="{{ route('file.store', $task) }}" class="p-4 mb-6 bg-white rounded-lg shadow" enctype="multipart/form-data" method="post">
-                        @csrf
-                        <input wire:model="uploadedFiles" type="file" name="uploadedFiles[]" multiple>
-                     <div>
-                        <button type="submit" class="p-2 bg-green-200 rounded ">Upload Files</button>
-                     </div>
-                    </form>
-
-                    @if($task->file->isNotEmpty())
-                    @foreach ($task->file as $file)
-                    <div class="flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                        <div class="flex items-center">
-                        <div class="">
-                            <img
-                            class="h-[83px] w-[83px] rounded-lg"
-                            src="https://cdn.dribbble.com/users/1397292/screenshots/16139947/media/8e4fd02616f0e1053030b7c9bc9559b5.png?resize=1600x1200&vertical=center"
-                            alt=""
-                            />
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-base font-medium text-navy-700 dark:text-white">
-                            {{ $file->name }}
-                            </p>
-                            @php
-                             $sizeInMB = round($file->size / (1024 * 1024), 2); 
-                        @endphp
-                            <p class="mt-2 text-sm text-gray-600">
-                                {{ $sizeInMB }} MB
+            <div class="flex items-center mb-6">
+                <div class="flex-1">
+                    <select class="p-2 border-gray-300 rounded">
+                        <option>All Departments</option>
+                    </select>
+                </div>
+                <div class="flex space-x-4">
+                    <button class="text-gray-600 hover:text-gray-800">Sort</button>
+                    <button class="text-gray-600 hover:text-gray-800">Filter</button>
+                    <div class="flex -space-x-2">
+                        <img src="https://via.placeholder.com/32" class="w-8 h-8 border-2 border-white rounded-full" alt="User 1">
+                        <img src="https://via.placeholder.com/32" class="w-8 h-8 border-2 border-white rounded-full" alt="User 2">
+                        <img src="https://via.placeholder.com/32" class="w-8 h-8 border-2 border-white rounded-full" alt="User 3">
+                        <div class="flex items-center justify-center w-8 h-8 text-gray-700 bg-gray-200 border-2 border-white rounded-full">+6</div>
+                    </div>
+                </div>
+            </div>
     
-                                <a
-                                class="ml-1 font-medium text-brand-500 hover:text-brand-500 dark:text-white"
-                                href=" "
-                            >
-                            </a>
-                            </p>
-                        </div>
-                        </div>
-                        <div class="flex items-center justify-center mr-4 text-gray-600 dark:text-white">
-                            <a href="{{ Storage::url($file->file_path) }}" download="{{ $file->name }}" class="bg-white">
-                                <x-icon name="m-arrow-down-on-square" />
-                            </a>|
-                            <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="bg-white">   <x-icon name="o-eye" /></a>|
-                            <x-button 
-                            wire:click="delete({{ $file->id }})" 
-                            class="btn-error" 
-                            wire:confirm="Are you sure?" 
-                            icon="o-trash"  
-                            spinner 
-                            responsive
-                        />
-
-                        </div>
+            <div class="flex items-center mb-4 space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.293 9.293a1 1 0 011.414 0L12 10.586l2.293-2.293a1 1 0 011.414 1.414L13.414 12l2.293 2.293a1 1 0 01-1.414 1.414L12 13.414l-2.293 2.293a1 1 0 01-1.414-1.414L10.586 12 8.293 9.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     </div>
-                    @endforeach
-                    @else
-                    <tr>
-                        <td colspan="2" class="text-center">No files available.</td>
-                    </tr>
-                    @endif
-                    <!-- Add file upload inputs and logic here if needed -->
-                </x-card>
-
-                {{-- MORE IMAGES --}}
-                <x-card title="Comments" separator>
-                    <x-form>
-                    <div class="mb-6 rounded-lg ">
-                        <div class="border-b "></div>
-                        <div class="flex w-full ">
-                            <div class="flex flex-row mx-5 mt-3 text-xs">
-                                <div class="flex items-center mb-2 mr-4 font-normal text-gray-700 rounded-md">Comments:<div class="ml-1 text-gray-400 text-ms"> {{ $task->comments->count() }}</div></div>
+                    <p class="font-semibold text-gray-700">Finance</p>
+                </div>
+            </div>
+    
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div class="p-4 bg-white rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
+                                <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.293 9.293a1 1 0 011.414 0L12 10.586l2.293-2.293a1 1 0 011.414 1.414L13.414 12l2.293 2.293a1 1 0 01-1.414 1.414L12 13.414l-2.293 2.293a1 1 0 01-1.414-1.414L10.586 12 8.293 9.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                             </div>
-                        </div>
-                        @if($task->comments->count() > 0)
-                        @foreach ($task->comments as $comment)
-                        <div class="flex p-4 antialiased text-black">
-                            <img class="w-8 h-8 mt-1 mr-2 rounded-full " src="https://cdn.dribbble.com/users/2071065/screenshots/5746865/dribble_2-01.png">
                             <div>
-                                <div class="bg-gray-100 rounded-lg px-4 pt-2 pb-2.5">
-                                    <div class="text-sm font-semibold leading-relaxed">{{ $comment->user->name }}</div>
-                                    <div class="text-xs leading-snug md:leading-normal">{{ $comment->comment }}.</div>
-                                </div>
-                                <div class="text-xs  mt-0.5 text-gray-500">{{ $comment->created_at->diffForHumans() }}</div>
-                                
+                                <p class="text-sm font-medium text-gray-700">Income Statement</p>
+                                <p class="text-xs text-gray-500">17.08.20</p>
                             </div>
                         </div>
-                        @endforeach
-                        @else
-                            <p>No comments available.</p>
-                        @endif
-                        
-        
-                        <div class="relative flex items-center self-center w-full max-w-xl p-4 overflow-hidden text-gray-600 focus-within:text-gray-400">
-                            <img class="object-cover w-10 h-10 mr-2 rounded-full shadow cursor-pointer" alt="User avatar" src="https://cdn.dribbble.com/users/2071065/screenshots/5746865/dribble_2-01.png">
-                            <span class="absolute inset-y-0 right-0 flex items-center pr-6">
-                                <button type="submit" wire:click="saveComment" class="p-1 focus:outline-none focus:shadow-none hover:text-blue-500" spinner>
-                                <svg class="w-6 h-6 text-gray-400 transition duration-300 ease-out hover:text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <x-icon name="o-paper-airplane"  />
-                                </svg>
-                                </button>
-                            </span>
-                                <input type="search" wire:model="comment" class="w-full py-2 pl-4 pr-10 text-sm placeholder-gray-400 bg-gray-100 border border-transparent appearance-none rounded-tg" style="border-radius: 25px" placeholder="Post a comment..." autocomplete="off">
-                            </div>
+                        <button class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
                     </div>
-                    </x-form>
-                </x-card>
+                    <div class="mt-4">
+                        <span class="inline-block px-2 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded-full"># Sanctions actions</span>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button class="text-sm font-medium text-blue-500 hover:underline">DETAILS</button>
+                    </div>
+                </div>
+                
+                <!-- Repeat similar blocks for Balance Sheet and Bank Statement -->
+                
+                <div class="p-4 bg-white rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
+                                <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.293 9.293a1 1 0 011.414 0L12 10.586l2.293-2.293a1 1 0 011.414 1.414L13.414 12l2.293 2.293a1 1 0 01-1.414 1.414L12 13.414l-2.293 2.293a1 1 0 01-1.414-1.414L10.586 12 8.293 9.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Balance Sheet</p>
+                                <p class="text-xs text-gray-500">17.08.20</p>
+                            </div>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <span class="inline-block px-2 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded-full"># Notice</span>
+                        <span class="inline-block px-2 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded-full"># News</span>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button class="text-sm font-medium text-blue-500 hover:underline">DETAILS</button>
+                    </div>
+                </div>
+    
+                <div class="p-4 bg-white rounded-lg shadow">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
+                                <img src="/images/support-us.png" width="300" class="mx-auto" />
+                            </div>
+                            <div class="flex items-start justify-start float-start">
+                                
+                                <p class="text-sm font-medium text-gray-700 ">Bank Statement</p>
+                                <p class="text-xs text-gray-500">17.08.20</p>
+                            </div>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <span class="inline-block"> <p class="text-sm font-medium text-gray-700 ">Bank Statement</p>
+                            <p class="text-xs text-gray-500">17.08.20</p></span>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button class="text-sm font-medium text-blue-500 hover:underline">DETAILS</button>
+                    </div>
+                </div>
+    
+                <div class="flex items-center justify-center p-4 border-2 border-gray-300 border-dashed rounded-lg">
+                    <button class="flex flex-col items-center text-gray-400 hover:text-gray-600">
+                        <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>ADD DOCUMENT</span>
+                    </button>
+                </div>
             </div>
         </div>
-
-     
-</div>
+    
+    </main>
+    
+    </div>

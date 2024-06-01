@@ -74,7 +74,12 @@ new class extends Component {
 
     public function headers(): array
     {
-        return [['key' => 'preview', 'label' => '', 'class' => 'w-14', 'sortable' => false], ['key' => 'name', 'label' => 'Name'], ['key' => 'status.name', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'], ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'], ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name'], ['key' => 'user.name', 'label' => 'Assignee', 'sortBy' => 'user_name']];
+        return [ 
+        ['key' => 'name', 'label' => 'Name'],
+
+        ['key' => 'status', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
+
+        ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'], ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name'], ['key' => 'user.name', 'label' => 'Assignee', 'sortBy' => 'user_name']];
     }
 
     public function with(): array
@@ -115,14 +120,14 @@ new class extends Component {
     <x-card>
         @if ($tasks->count() > 0)
             <x-table :headers="$headers" :rows="$tasks" link="/tasks/{id}/show" :sort-by="$sortBy" with-pagination>
-                {{--  @scope('cell_preview', $project)
-            <x-avatar :image="$project->cover" class="!w-10 !rounded-lg" />
-            @endscope --}}
-
+                @scope('cell_status', $task)
+            <x-badge :value="$task->status->name" :class="$task->status->color" />
+            @endscope
+      
                 @scope('actions', $task)
                     <td class="px-1 py-1 text-sm bg-white border-b border-gray-200">
                         <input type="checkbox" wire:model="selectedTasks.{{ $task->id }}"
-                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                            class="w-4 h-4 bg-blue-900 border-gray-300 rounded focus:ring-blue-900 dark:focus:ring-blue-900 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                             wire:change="changeStatus({{ $task->id }})" {{ $task->status_id == 5 ? 'checked' : '' }}>
                     </td>
                 @endscope

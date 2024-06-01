@@ -71,7 +71,7 @@ Route::post('change-password', [changePasswordController::class, 'changePassword
 
 //projects
 Volt::route('/projects', 'projects.index');
-Volt::route('/projects/create', 'projects.create');
+Volt::route('/projects/create', 'projects.create')->name('projects.create');
 Volt::route('/projects/{project}/edit', 'projects.edit');
 Volt::route('/projects/{project}/show', 'projects.show');
 
@@ -82,14 +82,22 @@ Volt::route('/tasks', 'tasks.index');
 Volt::route('/tasks/{task}/edit', 'tasks.edit')->name('tasks.edit');
 Volt::route('/tasks/{task}/show', 'tasks.show')->name('tasks.show');
 
+//documents
+Volt::route('/documents', 'documents.index');
+Volt::route('/documents/{document}/show', 'documents.show')->name('documents.show');
+
+
+
 
 //files
 
 Route::post('/upload-files/{task}', [FileController::class, 'store'])->name('file.store');
+Route::post('/document-file/{document}', [FileController::class, 'documentfile'])->name('file.documentfile');
 
 //reportdepartment
 Volt::route('/report/department', 'report.dept');
 Volt::route('/enrigistrement', 'report.enrigistrement');
+Volt::route('/actorsearch', 'report.actorsearch');
 //Route::get(/Enrigistrement), 'report.enrigistrement'
 //Route::get('/report/department/search', [ReportController::class, 'reportdept'])->name('reportdepart.search');
 
