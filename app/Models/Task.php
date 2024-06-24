@@ -68,16 +68,18 @@ class Task extends Model
    {
        return $this->morphMany(History::class, 'model');
    }
-   public function user(): BelongsTo
+   public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
+
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class,'assigned_id');
     }
-    public function tasks()
+    public function subtasks()
     {
-        return Task::where('project_id', $this->project->id)->get();
+        return $this->hasMany(Subtask::class);
     }
+    
 }

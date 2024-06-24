@@ -123,7 +123,6 @@ new class extends Component {
                 @scope('cell_status', $task)
             <x-badge :value="$task->status->name" :class="$task->status->color" />
             @endscope
-      
                 @scope('actions', $task)
                     <td class="px-1 py-1 text-sm bg-white border-b border-gray-200">
                         <input type="checkbox" wire:model="selectedTasks.{{ $task->id }}"

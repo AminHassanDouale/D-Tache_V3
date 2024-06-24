@@ -43,6 +43,9 @@ new class extends Component {
     {
         return Project::query()
             ->with(['status', 'category', 'priority'])
+            ->withCount(['tasks', 'tasks as incomplete_tasks_count' => function ($query) {
+                $query->where('status_id', '!=', 5);
+            }])
             ->withAggregate('status', 'name')
             ->withAggregate('category', 'name')
             ->withAggregate('priority', 'name')
@@ -52,6 +55,7 @@ new class extends Component {
             ->when($this->priority_id, fn(Builder $q) => $q->where('priority_id', $this->priority_id))
             ->orderBy(...array_values($this->sortBy))
             ->paginate(100);
+            
     }
 
     public function headers(): array
@@ -60,6 +64,7 @@ new class extends Component {
             ['key' => 'id', 'label' => 'No', 'class' => '', 'sortable' => true],
             ['key' => 'name', 'label' => 'Name'],
             ['key' => 'status', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
+            ['key' => 'No', 'label' => 'No', 'sortBy' => 'No', 'class' => 'hidden lg:table-cell'],
 
             ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'],
             ['key' => 'priority.name', 'label' => 'Priority', 'sortBy' => 'priority_name', 'class' => 'hidden lg:table-cell' ],
@@ -101,10 +106,8 @@ new class extends Component {
     </x-header>
     <x-card>
         @if($projects->count() > 0)
-        <x-table :headers="$headers" :rows="$projects" link="/projects/{id}/show" :sort-by="$sortBy" with-pagination>
-            @scope('actions', $project)
-            <x-button :link="'/projects/' . $project->id . '/edit'" icon="o-eye" class="btn-sm btn-ghost text-error" spinner />
-            @endscope
+        <x-table :headers="$headers" :rows="$projects" link="/projects/{id}/edit" :sort-by="$sortBy" with-pagination>
+           
             @scope('cell_status', $project)
             <x-badge :value="$project->status->name" :class="$project->status->color" />
             @endscope 
@@ -115,6 +118,27 @@ new class extends Component {
                 @empty
                     <li>No tasks</li>
                 @endforelse
+            </ul>
+            @endscope
+            @scope('cell_No', $project)
+            <ul class="px-6 py-4 whitespace-nowrap">
+                @if($project->tasks_count > 0)
+                    @php
+                        $completionPercentage = 100 - ($project->incomplete_tasks_count / $project->tasks_count) * 100;
+                        $progressBarColor = $completionPercentage < 100 ? 'bg-yellow-500' : 'bg-green-500';
+                        $isCompleted = $completionPercentage >= 100;
+                    @endphp
+                    <div class="w-full bg-gray-200 rounded-full">
+                        <div class="{{ $progressBarColor }} text-xs font-medium text-white text-center p-0.5 leading-none rounded-l-full" style="width: {{ $completionPercentage }}%">
+                            {{ number_format($completionPercentage) }}%
+                        </div>
+                    </div>
+                    @if(!$isCompleted)
+                        <x-progress class="progress-primary h-0.5" indeterminate />
+                    @endif
+                @else
+                    No tasks
+                @endif
             </ul>
             @endscope
         </x-table>

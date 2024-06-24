@@ -33,7 +33,7 @@ Volt::route('/login', 'login')->name('login');
 
 Route::middleware('auth')->group(function () {
 //    // home
-    Volt::route('/home', 'dashboard.index');
+    Volt::route('/home', 'dashboard.stats');
 //
 //    // Users
     Volt::route('/users', 'users.index');
@@ -74,6 +74,21 @@ Volt::route('/projects', 'projects.index');
 Volt::route('/projects/create', 'projects.create')->name('projects.create');
 Volt::route('/projects/{project}/edit', 'projects.edit');
 Volt::route('/projects/{project}/show', 'projects.show');
+
+
+//students
+Volt::route('/students', 'students.index');
+Volt::route('/students/create', 'students.create');
+Volt::route('/students/{student}/show', 'students.show');
+Volt::route('/students/{student}/edit', 'students.edit');
+
+
+
+//invoice
+
+Volt::route('/invoices/create/{student_id}/{bill_method_quantity_id}', 'invoices.create')->name('invoices.create');
+Volt::route('/invoices/{invoice}/edit', 'invoices.edit')->name('invoices.edit');
+
 
 
 

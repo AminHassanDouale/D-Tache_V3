@@ -15,6 +15,14 @@ class Status extends Model
     }
 
     // In your Status model
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+    public function status()
+    {
+        return $this->belongsTo(Status::class);
+    }
 
 
 }

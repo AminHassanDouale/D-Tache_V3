@@ -18,33 +18,20 @@ class StatusSeeder extends Seeder
         }
 
         Status::insert([
+          
+           
             [
-                'name' => 'A faire',
-                'description' => '1er phase',
-                'color' => 'bg-neutral/20',
-                'icon' => 'o-shopping-bag'
-            ],
-            [
-                'name' => 'en cours de traitement',
-                'description' => '2eme phase',
-                'color' => 'bg-purple-500/20',
-                'icon' => 'o-map-pin'
-            ],
-            [
-                'name' => 'Verification',
-                'description' => '3eme phase',
+                'name' => 'not paid',
                 'color' => 'bg-info/20',
                 'icon' => 'o-credit-card'
             ],
             [
-                'name' => 'Confirmation',
-                'description' => '4eme phase',
+                'name' => 'partially paid',
                 'color' => 'bg-warning/20',
                 'icon' => 'o-paper-airplane'
             ],
             [
-                'name' => 'Fait',
-                'description' => '5eme phase',
+                'name' => 'paid',
                 'color' => 'bg-success/20',
                 'icon' => 'o-gift'
             ]

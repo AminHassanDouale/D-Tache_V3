@@ -29,15 +29,23 @@
     {{-- Sortable.js --}}
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.1/Sortable.min.js"></script>
 
-    {{-- TinyMCE  --}}
-    <script src="https://cdn.tiny.cloud/1/kecao1uumzo3qt3o90pztdtlp82b4ctv8tkvsrjgcx34ock5/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
     {{-- PhotoSwipe --}}
     <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/umd/photoswipe.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/umd/photoswipe-lightbox.umd.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@2.9.6/build/vanilla-calendar.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@2.9.6/build/vanilla-calendar.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        @media print {
+            .print-hide {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body class="min-h-screen font-sans antialiased bg-base-200/50 dark:bg-base-200">
 <x-nav sticky class="lg:hidden">
@@ -78,19 +86,7 @@
             <x-menu-separator />
 
             <x-menu-item title="Home" icon="o-chart-pie" link="/home" />
-            <x-menu-item title="Projects" icon="o-squares-plus" link="/projects" />
-            <x-menu-item title="Documents" icon="o-folder-minus" link="/documents" />
-            <x-menu-item title="Tasks" icon="o-document-check" link="/tasks" />
-            <x-menu-item title="Report" icon="o-chart-bar" link="/report/department" />
-            <x-menu-item title="Enrigistrement" icon="s-finger-print" link="/enrigistrement" />
-
-            <x-menu-sub title="Warehouse" icon="o-wrench-screwdriver">
-                <x-menu-item title="users" icon="o-user" link="/users" />
-                <x-menu-item title="Categories" icon="o-hashtag" link="/categories" />
-                <x-menu-item title="Role" icon="o-cube" link="/roles" />
-                <x-menu-item title="Permission" icon="o-cube" link="/permissions" />
-            </x-menu-sub>
-
+            <x-menu-item title="students" icon="o-folder-minus" link="/students" />
             <x-menu-separator />
 
             <x-menu-item title="Search" @click.stop="$dispatch('mary-search-open')" icon="o-magnifying-glass" badge="Cmd + G" />

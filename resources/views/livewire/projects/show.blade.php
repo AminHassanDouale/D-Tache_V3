@@ -320,7 +320,7 @@ Priority: <p class="{{ $project->priority->color }}">{{ $project->priority->name
                 @endif
                  
             </x-card>
-    
+         
             {{-- FAVORITES --}}
       
         </div>
