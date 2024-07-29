@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -62,4 +63,11 @@ public function owner()
 {
     return $this->belongsTo(User::class, 'user_id'); 
 }
+public function getDurationAttribute()
+    {
+        $startDate = Carbon::parse($this->start_date);
+        $dueDate = Carbon::parse($this->due_date);
+
+        return $startDate->diffForHumans($dueDate, true);
+    }
 }

@@ -33,7 +33,7 @@ Volt::route('/login', 'login')->name('login');
 
 Route::middleware('auth')->group(function () {
 //    // home
-    Volt::route('/home', 'dashboard.index');
+    Volt::route('/home', 'dashboard.stats');
 //
 //    // Users
     Volt::route('/users', 'users.index');

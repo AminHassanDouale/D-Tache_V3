@@ -18,18 +18,18 @@ new class extends Component {
     use Toast, HasCssClassAttribute;
 
     #[Rule('required')]
-    public string $name = ''; 
+    public string $name = '';
     #[Rule('required')]
-    public string $description = ''; 
+    public string $description = '';
     #[Rule('required|date')]
-    public string $start_date = ''; 
+    public string $start_date = '';
     #[Rule('required')]
     public string $due_date = '';
     public int $assigned_id = 0; // Set a default value
     public int $project_id = 0; // Set a default value
     public int $priority_id = 0; // Set a default value
 
-   
+
 
 
     public bool $show = false;
@@ -37,7 +37,7 @@ new class extends Component {
     public string $label = 'Create';
 
     public function save(): void
-    { 
+    {
         $this->validate([
         'name' => 'required',
         'description' => 'required',
@@ -64,7 +64,7 @@ new class extends Component {
         'task' => $task,
         'assigned' => $assigned,
         'creator' => $creator,
-        'project' => $task->project, 
+        'project' => $task->project,
     ]));
 
     $this->show = false;
@@ -80,7 +80,7 @@ new class extends Component {
 
     {{-- This component can be used inside another forms. So we teleport it to body to avoid nested form submission conflict --}}
     <template x-teleport="body">
-        <x-modal wire:model="show" title="Create Brand">
+        <x-modal wire:model="show" title="Create Task">
             <hr class="mb-5" />
             <x-form wire:submit="save">
                 <x-input label="Name" wire:model="name" />

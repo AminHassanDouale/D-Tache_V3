@@ -239,7 +239,6 @@ $this->validate([
     public function headers(): array
 {
     return [
-            ['key' => 'preview', 'label' => '', 'class' => 'w-14', 'sortable' => false],
             ['key' => 'name', 'label' => 'Name'],
             ['key' => 'status.name', 'label' => 'Status', 'sortBy' => 'status_name', 'class' => 'hidden lg:table-cell'],
             ['key' => 'category.name', 'label' => 'Category', 'sortBy' => 'category_name', 'class' => 'hidden lg:table-cell'],
@@ -257,12 +256,9 @@ $this->validate([
     <div class="grid content-start gap-8">
 
     <x-header :title="$project->name" separator>
-        <x-slot:actions>
-        </x-slot:actions>
     </x-header>
-    <x-errors title="Oops!" description="Please, fix the errors below." />
 
-    <div class="grid gap-8 lg:grid-cols-2">
+    <div class="grid gap-8 pt-0 lg:grid-cols-2">
         {{-- CUSTOMER --}}
         <x-form wire:submit.prevent="saveProject">
 
@@ -333,17 +329,16 @@ $this->validate([
                 </x-card>
                 @endif
                 </x-form>
-                
-                
-        
-        
 
     </div>
 {{-- ITEMS --}}
 <div class="grid content-start gap-8">
     <x-card title="tasks" separator>
            
-        <x-table :headers="$headers" :rows="$tasks" />
+        <x-table :headers="$headers" link="/tasks/{id}/show" :rows="$tasks">
+            
+        </x-table>
+
         @if(!$tasks->count())
         <x-icon name="o-list-bullet" label="Nothing here." class="mt-5 text-gray-400" />
     @endif
