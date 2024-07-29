@@ -46,9 +46,9 @@ class FileController extends Controller
                 File::create([
                     'model_id' => $task->id,
                     'model_type' => Task::class,
-                    'filename' => $fileName, 
+                    'filename' => $fileName,
                     'file_path' => $filePath,
-                    'name' => $file->getClientOriginalName(), 
+                    'name' => $file->getClientOriginalName(),
                     'type' => $file->getClientOriginalExtension(),
                     'size' => $file->getSize(),
                     'user_id' => auth()->id(),
@@ -80,8 +80,8 @@ class FileController extends Controller
         }
 
 
-        return redirect()->route('tasks.show', ['task' => $task->id]);
-    
+        return redirect()->route('tasks.edit', ['task' => $task->id]);
+
     }
 
     public function documentfile(Request $request, Document $document)
@@ -96,9 +96,9 @@ class FileController extends Controller
                 File::create([
                     'model_id' => $document->id,
                     'model_type' => Document::class,
-                    'filename' => $fileName, 
+                    'filename' => $fileName,
                     'file_path' => $filePath,
-                    'name' => $file->getClientOriginalName(), 
+                    'name' => $file->getClientOriginalName(),
                     'type' => $file->getClientOriginalExtension(),
                     'size' => $file->getSize(),
                     'user_id' => auth()->id(),
@@ -109,7 +109,7 @@ class FileController extends Controller
                     'model_id' => $document->id,
                     'model_type' => Document::class,
                     'date' => now(),
-                    'name' => $document->name, 
+                    'name' => $document->name,
                     'department_id' => Auth::user()->department_id,
                     'user_id' => Auth::id(),
                 ]);
@@ -140,7 +140,7 @@ class FileController extends Controller
 
 
         return redirect()->route('documents.show', ['document' => $document->id]);
-    
+
     }
 
     /**

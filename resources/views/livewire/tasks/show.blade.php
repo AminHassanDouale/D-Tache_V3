@@ -34,7 +34,7 @@ new class extends Component {
     public $category_id;
     public $start_date;
     public $due_date;
-    public $files = []; 
+    public $files = [];
     public $tags = [];
     public $comment;
     public $selectedTaskId;
@@ -81,7 +81,7 @@ new class extends Component {
     {
         return User::orderBy('name')->get();
     }
-    
+
 
     public function saveTask()
 {
@@ -118,14 +118,12 @@ new class extends Component {
 }
 public function delete($fileId): void
     {
-    
+
         $file = File::find($fileId);
 
 if ($file) {
-    // Delete the file from storage
     Storage::delete($file->file_path);
 
-    // Delete the file record from the database
     $file->delete();
 
     $this->toast(
@@ -163,11 +161,11 @@ if ($file) {
 
 
     $this->comment = '';
-    $this->task->load('comments'); 
+    $this->task->load('comments');
 
-    
-$taskOwner = $this->task->user; 
-$taskAssignee = $this->task->assignee; 
+
+$taskOwner = $this->task->user;
+$taskAssignee = $this->task->assignee;
 
 
 $commentText = $validatedData['comment'];
@@ -181,7 +179,7 @@ if ($taskOwner) {
 
 if ($taskAssignee && $taskAssignee->id !== $taskOwner->id) {
     Mail::to($taskAssignee->email)->send(new TaskCommented($this->task, $commentText));
-} 
+}
     $this->comments = $this->task->comments()->orderBy('created_at')->get();
 
     $this->toast('success', 'Comment added successfully.');
@@ -203,11 +201,11 @@ if ($taskAssignee && $taskAssignee->id !== $taskOwner->id) {
 //  update task name //
 public function changeTaskName()
 {
-    
+
 
     $this->task->update(['name' => $this->name]);
 
-    
+
 
     $this->toast(
             type: 'warning',
@@ -223,7 +221,7 @@ public function changeTaskName()
 
 }
 
-// update Task Description 
+// update Task Description
 public function changeTaskDescription()
 {
     $this->task->update(['description' => $this->description]);
@@ -288,7 +286,7 @@ public function changeStatus()
 
     // update task start update  //
 
-    
+
     public function updateStartDate($newStartDate)
 {
     $startDate = Carbon::parse($newStartDate);
@@ -313,12 +311,12 @@ public function changeStatus()
 
 
 
-   // update task  due date  // 
+   // update task  due date  //
 
 public function updateEndDate($newEndDate)
 {
     $endDate = Carbon::parse($newEndDate);
-    
+
     $this->task->update(['due_date' => $endDate]);
 
 
@@ -343,14 +341,13 @@ public function changeAssignee()
     $assigned = User::findOrFail($this->assigned_id);
     $creator = auth()->user();
 
-    // Corrected line: Replace '$task' with '$this->task'
     Mail::to($assigned->email)->send(new TaskCreatedMail([
-        'task' => $this->task, // Corrected variable
+        'task' => $this->task,
         'assigned' => $assigned,
         'creator' => $creator,
-        'project' => $this->task->project, // Assuming $this->task->project is accessible
+        'project' => $this->task->project,
     ]));
-    
+
     $this->toast(
         type: 'warning',
         title: 'Mise A jour, Assignee!',
@@ -398,7 +395,7 @@ public function changeCategory()
         ]);
 
         $this->subtaskName = '';
-    
+
     }
 // checked the subtask //
 public function toggleSubtaskCompletion(Subtask $subtask)
@@ -436,7 +433,7 @@ private function logHistory($action, $modelId, $modelType)
             'model_id' => $modelId,
             'model_type' => $modelType,
             'date' => now(),
-            'name' => $this->name, 
+            'name' => $this->name,
             'department_id' => Auth::user()->department_id,
             'user_id' => Auth::id(),
         ]);
@@ -464,7 +461,7 @@ private function logHistory($action, $modelId, $modelType)
         <div class="w-full mb-6 lg:w-2/3 lg:pr-6 lg:mb-0">
             <div class="mb-4 text-lg font-semibold">{{ $task->name }}</div>
             <div class="mb-4 text-sm text-gray-500">{{ $task->description }}</div>
-            
+
             <ul class="mb-6">
                 <li class="flex items-center mb-2">
                     <span class="p-2">Category: {{ $task->category->name }}</span>
@@ -481,37 +478,36 @@ private function logHistory($action, $modelId, $modelType)
 
             <div class="text-sm text-gray-500 ">Subtasks</div>
             <hr>
-                    <div class="flex items-center justify-between mb-4">
-                        <h1 class="text-xl font-bold">{{ $completedSubtasksCount }} out of {{ $task->subtasks->count() }}</h1>
-                        <button class="text-blue-500">Check all</button>
-                    </div>
-                    <div>
-                        <table class="w-full">
-                            <thead>
-                                <tr>
-                                    <th class="px-4 py-2">Name</th>
-                                    <th class="px-4 py-2">Completed</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($task->subtasks as $subtask)
-                                    <tr>
-                                        <td class="px-4 py-2 border">{{ $subtask->name }}</td>
-                                        <td class="px-4 py-2 text-center border">
-                                            <input type="checkbox" 
-                                                   wire:click="toggleSubtaskCompletion({{ $subtask->id }})"
-                                                   class=""
-                                                   {{ $subtask->completed ? 'checked' : '' }}>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        <!-- Repeat above structure for remaining items -->
-                    </div>
-                
-            
-            <button wire:click="$set('selectedTaskId', {{ $task->id }})" @click="$wire.myModal2 = true">Add Subtask</button>
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-xl font-bold">{{ $completedSubtasksCount }} out of {{ $task->subtasks->count() }}</h1>
+            </div>
+            <div>
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($task->subtasks as $subtask)
+                            <tr>
+                                <td class="px-4 py-2 border">{{ $subtask->name }}</td>
+                                <td class="px-4 py-2 text-center border">
+
+                                    <input type="checkbox"
+                                           wire:click="toggleSubtaskCompletion({{ $subtask->id }})"
+                                           class=""
+                                           {{ $subtask->completed ? 'checked' : '' }}>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+
+            <button wire:click="$set('selectedTaskId', {{ $task->id }})" @click="$wire.myModal2 = true" class="pt-3 text-bold">Add Subtask</button>
             <x-modal wire:model="myModal2" title="Add Subtask" class="backdrop-blur">
                 <x-slot:actions>
                     <input type="text" wire:model="subtaskName" placeholder="New subtask" class="w-full px-4 py-2 mb-4 border rounded">
@@ -519,6 +515,7 @@ private function logHistory($action, $modelId, $modelType)
                 </x-slot:actions>
             </x-modal>
         </div>
+        <div class="hidden mx-6 border-l border-gray-200 lg:block"></div>
 
         <!-- Task Sidebar Section -->
         <div class="w-full lg:w-1/3 lg:pl-6">
@@ -589,7 +586,7 @@ private function logHistory($action, $modelId, $modelType)
             @else
                 <p>No comments available.</p>
             @endif
-            
+
             <div class="relative flex items-center self-center w-full max-w-xl p-4 overflow-hidden text-gray-600 focus-within:text-gray-400">
                 <img class="object-cover w-10 h-10 mr-2 rounded-full shadow cursor-pointer" alt="User avatar" src="https://cdn.dribbble.com/users/2071065/screenshots/5746865/dribble_2-01.png">
                 <span class="absolute inset-y-0 right-0 flex items-center pr-6">
@@ -599,12 +596,12 @@ private function logHistory($action, $modelId, $modelType)
                         </svg>
                     </button>
                 </span>
-                
+
                 <input type="search" wire:model="comment" class="w-full py-10 pl-4 pr-10 text-sm placeholder-gray-400 bg-gray-100 border border-transparent rounded-lg appearance-none" style="border-radius: 25px" placeholder="Post a comment..." autocomplete="off">
             </div>
             </x-tab>
-            <x-tab name="musics-tab" label="Musics">
-                <div>Musics</div>
+            <x-tab name="musics-tab" label="Files">
+                <div></div>
             </x-tab>
         </x-tabs>
     </x-card>

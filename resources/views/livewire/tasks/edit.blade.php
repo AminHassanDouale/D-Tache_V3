@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Mail;
 
 new class extends Component {
     use Toast;
-    
+
     public Task $task;
     public $name;
     public $assigned_id;
@@ -32,7 +32,7 @@ new class extends Component {
     public $category_id;
     public $start_date;
     public $due_date;
-    public $files = []; 
+    public $files = [];
     public $tags = [];
     public $comment;
     public function mount(Task $task)
@@ -74,7 +74,7 @@ new class extends Component {
     {
         return User::orderBy('name')->get();
     }
-    
+
 
     public function saveTask()
 {
@@ -91,7 +91,6 @@ new class extends Component {
         'due_date' => 'required|date|after_or_equal:start_date',
     ]);
 
-    // Fill the task model with validated data
     $this->task->fill($validatedData);
 
     // Save the task
@@ -111,7 +110,7 @@ new class extends Component {
 }
 public function delete($fileId): void
     {
-    
+
         $file = File::find($fileId);
 
 if ($file) {
@@ -144,23 +143,23 @@ if ($file) {
     public function saveComment()
 {
     $validatedData = $this->validate([
-        'comment' => 'required|string|max:255', 
+        'comment' => 'required|string|max:255',
     ]);
 
     $this->task->comments()->create([
         'comment' => $this->comment,
-        'user_id' => Auth::id(), 
+        'user_id' => Auth::id(),
         'department_id' => Auth::user()->department_id,
         'date' => now(),
     ]);
 
 
     $this->comment = '';
-    $this->task->load('comments'); 
+    $this->task->load('comments');
 
-    
-$taskOwner = $this->task->user; 
-$taskAssignee = $this->task->assignee; 
+
+$taskOwner = $this->task->user;
+$taskAssignee = $this->task->assignee;
 
 
 $commentText = $validatedData['comment'];
@@ -174,7 +173,7 @@ if ($taskOwner) {
 
 if ($taskAssignee && $taskAssignee->id !== $taskOwner->id) {
     Mail::to($taskAssignee->email)->send(new TaskCommented($this->task, $commentText));
-} 
+}
     $this->comments = $this->task->comments()->orderBy('created_at')->get();
 
     $this->toast('success', 'Comment added successfully.');
@@ -196,11 +195,11 @@ if ($taskAssignee && $taskAssignee->id !== $taskOwner->id) {
 //  update task name //
 public function changeTaskName()
 {
-    
+
 
     $this->task->update(['name' => $this->name]);
 
-    
+
 
     $this->toast(
             type: 'warning',
@@ -216,7 +215,7 @@ public function changeTaskName()
 
 }
 
-// update Task Description 
+// update Task Description
 public function changeTaskDescription()
 {
     $this->task->update(['description' => $this->description]);
@@ -281,7 +280,7 @@ public function changeStatus()
 
     // update task start update  //
 
-    
+
     public function updateStartDate($newStartDate)
 {
     $startDate = Carbon::parse($newStartDate);
@@ -306,12 +305,12 @@ public function changeStatus()
 
 
 
-   // update task  due date  // 
+   // update task  due date  //
 
 public function updateEndDate($newEndDate)
 {
     $endDate = Carbon::parse($newEndDate);
-    
+
     $this->task->update(['due_date' => $endDate]);
 
 
@@ -343,7 +342,7 @@ public function changeAssignee()
         'creator' => $creator,
         'project' => $this->task->project, // Assuming $this->task->project is accessible
     ]));
-    
+
     $this->toast(
         type: 'warning',
         title: 'Mise A jour, Assignee!',
@@ -405,7 +404,7 @@ private function logHistory($action, $modelId, $modelType)
             'model_id' => $modelId,
             'model_type' => $modelType,
             'date' => now(),
-            'name' => $this->name, 
+            'name' => $this->name,
             'department_id' => Auth::user()->department_id,
             'user_id' => Auth::id(),
         ]);
@@ -427,7 +426,7 @@ private function logHistory($action, $modelId, $modelType)
 
 
 
-   
+
 
         <div class="grid gap-2 lg:grid-cols-2">
             {{-- DETAILS --}}
@@ -437,15 +436,15 @@ private function logHistory($action, $modelId, $modelType)
                     <x-input label="Task Name" wire:model.defer="name" placeholder="Enter task name" :value="$task->name" wire:keydown.enter="changeTaskName" />
 </x-card>
                                                                     <!-- Description update views  -->
-        
+
 
                         <form wire:submit.prevent="changeTaskDescription">
 
                     <x-textarea
                         label="Description"
                         wire:model="description"
-                        rows="5" 
-                        inline 
+                        rows="5"
+                        inline
                     />
                     <div class="mt-4">
                         <x-button type="submit" class="bg-blue-500">Update Description</x-button>
@@ -453,7 +452,7 @@ private function logHistory($action, $modelId, $modelType)
                 </form>
 
                                                             <!-- Status update views  -->
-                                                            <label for="">Status</label>         
+                                                            <label for="">Status</label>
 
                 <select wire:model="status_id" label="Status" wire:change="changeStatus" id="status" name="status" class="block w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow hover:border-dotted" >
                     @foreach($statuses as $status)
@@ -461,7 +460,7 @@ private function logHistory($action, $modelId, $modelType)
                     @endforeach
                 </select>
                                                             <!-- Priority update views  -->
-                                                            <label for="">Priority</label>         
+                                                            <label for="">Priority</label>
 
              <select wire:model="priority_id" label="Priority" wire:change="changePriority" id="priority" name="priority" class="block w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow hover:border-dotted" >
                     @foreach($priorities as $priority)
@@ -469,7 +468,7 @@ private function logHistory($action, $modelId, $modelType)
                     @endforeach
                 </select>
                                                             <!-- Start_date update views  -->
-                                                            
+
 
                 <div class="p-6 mt-6 bg-white rounded-lg shadow">
                 @php
@@ -484,7 +483,7 @@ private function logHistory($action, $modelId, $modelType)
             </div>
 
                                                          <!-- Assignee update views  -->
-                                                         <label for="">Assigned</label>         
+                                                         <label for="">Assigned</label>
 
 
             <select wire:model="assignee_id" label="Assigned" wire:change="changeAssignee" id="assignee" name="assignee" class="w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow p-8block hover:border-dotted" >
@@ -495,17 +494,17 @@ private function logHistory($action, $modelId, $modelType)
 
                                             <!-- category update views  -->
 
-                                            <label for="">Category</label>         
+                                            <label for="">Category</label>
 
 
             <select wire:model="category_id" label="Category" wire:change="changeCategory" id="category" name="category" class="block w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow hover:border-dotted" >
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach
-            </select> 
-            
+            </select>
+
                                 <!-- project update views  -->
-                                <label for="">Project</label>         
+                                <label for="">Project</label>
 
 
             <select wire:model="project_id" label="Project" wire:change="changeProject" id="project" name="project" class="block w-full p-8 border-0 border-solid divide-y divide-blue-200 rounded shadow hover:border-dotted" >
@@ -513,11 +512,11 @@ private function logHistory($action, $modelId, $modelType)
                     <option value="{{ $project->id }}">{{ $project->name }}</option>
                 @endforeach
             </select>
-                  
+
 
                 </div>
-               
-            
+
+
 
             <div class="grid content-start gap-8">
                 <x-card title="Files" separator>
@@ -533,7 +532,7 @@ private function logHistory($action, $modelId, $modelType)
                     @foreach ($task->file as $file)
                     <div class="flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
                         <div class="flex items-center">
-                            
+
                         <div class="">
                             <img
                             class="h-[83px] w-[83px] rounded-lg"
@@ -546,11 +545,11 @@ private function logHistory($action, $modelId, $modelType)
                             {{ $file->name }}
                             </p>
                             @php
-                             $sizeInMB = round($file->size / (1024 * 1024), 2); 
+                             $sizeInMB = round($file->size / (1024 * 1024), 2);
                         @endphp
                             <p class="mt-2 text-sm text-gray-600">
                                 {{ $sizeInMB }} MB
-    
+
                                 <a
                                 class="ml-1 font-medium text-brand-500 hover:text-brand-500 dark:text-white"
                                 href=" "
@@ -564,12 +563,12 @@ private function logHistory($action, $modelId, $modelType)
                                 <x-icon name="m-arrow-down-on-square" />
                             </a>|
                             <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="bg-white">   <x-icon name="o-eye" /></a>|
-                            <x-button 
-                            wire:click="delete({{ $file->id }})" 
-                            class="btn-error" 
-                            wire:confirm="Are you sure?" 
-                            icon="o-trash"  
-                            spinner 
+                            <x-button
+                            wire:click="delete({{ $file->id }})"
+                            class="btn-error"
+                            wire:confirm="Are you sure?"
+                            icon="o-trash"
+                            spinner
                             responsive
                         />
 
@@ -604,15 +603,15 @@ private function logHistory($action, $modelId, $modelType)
                                     <div class="text-xs leading-snug md:leading-normal">{{ $comment->comment }}.</div>
                                 </div>
                                 <div class="text-xs  mt-0.5 text-gray-500">{{ $comment->created_at->diffForHumans() }}</div>
-                                
+
                             </div>
                         </div>
                         @endforeach
                         @else
                             <p>No comments available.</p>
                         @endif
-                        
-        
+
+
                         <div class="relative flex items-center self-center w-full max-w-xl p-4 overflow-hidden text-gray-600 focus-within:text-gray-400">
                             <img class="object-cover w-10 h-10 mr-2 rounded-full shadow cursor-pointer" alt="User avatar" src="https://cdn.dribbble.com/users/2071065/screenshots/5746865/dribble_2-01.png">
                             <span class="absolute inset-y-0 right-0 flex items-center pr-6">
@@ -630,5 +629,5 @@ private function logHistory($action, $modelId, $modelType)
             </div>
         </div>
 
-     
+
 </div>
